@@ -1,0 +1,169 @@
+<div class="leftside-menu">
+
+    <!-- Brand Logo Light -->
+    @include('layouts.components.sidebar-brand_logo')
+
+    <!-- Sidebar Hover Menu Toggle Button -->
+    <div class="button-sm-hover" data-bs-toggle="tooltip" data-bs-placement="right" title="Show Full Sidebar">
+        <i class="ri-checkbox-blank-circle-line align-middle"></i>
+    </div>
+
+    <!-- Full Sidebar Menu Close Button -->
+    <div class="button-close-fullsidebar">
+        <i class="ri-close-fill align-middle"></i>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="h-100" id="leftside-menu-container" data-simplebar>
+        <!-- Leftbar User -->
+        <div class="leftbar-user">
+            <a href="pages-profile.html">
+                <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42" class="rounded-circle shadow-sm">
+                <span class="leftbar-user-name mt-2">{{ Auth::user()->name }}</span>
+            </a>
+        </div>
+
+        <!--- Sidemenu -->
+
+        <div class="leftside-menu">
+
+            <!-- Brand Logo -->
+            <a href="#" class="logo logo-light">
+                <span class="logo-lg">
+                    <img src="assets/images/logo.png" alt="logo">
+                </span>
+                <span class="logo-sm">
+                    <img src="assets/images/logo-sm.png" alt="small logo">
+                </span>
+            </a>
+
+            <a href="#" class="logo logo-dark">
+                <span class="logo-lg">
+                    <img src="assets/images/logo-dark.png" alt="dark logo">
+                </span>
+                <span class="logo-sm">
+                    <img src="assets/images/logo-dark-sm.png" alt="small logo">
+                </span>
+            </a>
+
+            <div class="button-sm-hover" data-bs-toggle="tooltip" data-bs-placement="right" title="Show Full Sidebar">
+                <i class="ri-checkbox-blank-circle-line align-middle"></i>
+            </div>
+
+            <div class="button-close-fullsidebar">
+                <i class="ri-close-fill align-middle"></i>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="h-100" id="leftside-menu-container" data-simplebar>
+                <!-- Leftbar User -->
+                <div class="leftbar-user">
+                    <a href="#">
+                        <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42"
+                            class="rounded-circle shadow-sm">
+                        <span class="leftbar-user-name mt-2">{{ Auth::user()->name }}</span>
+                    </a>
+                </div>
+
+                <!--- Sidemenu -->
+                <ul class="side-nav">
+
+                    <li class="side-nav-title">Navigation</li>
+
+                    <li class="side-nav-item">
+                        <a href="/dashboard" class="side-nav-link">
+                            <i class="uil-home-alt"></i>
+                            <span> Dashboard </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-title">Learning Management</li>
+
+                    <li class="side-nav-item">
+                        <a data-bs-toggle="collapse" href="#sidebarUsers" aria-expanded="false"
+                            aria-controls="sidebarUsers" class="side-nav-link">
+                            <i class="uil-users-alt"></i>
+                            <span> Users </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarUsers">
+                            <ul class="side-nav-second-level">
+                                <li><a href="/student">Students</a></li>
+                                <li><a href="/teacher">Teachers</a></li>
+                                <li><a href="/admin">Admins</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a data-bs-toggle="collapse" href="#sidebarClasses" aria-expanded="false"
+                            aria-controls="sidebarClasses" class="side-nav-link">
+                            <i class="uil-books"></i>
+                            <span> Classes & Subjects </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarClasses">
+                            <ul class="side-nav-second-level">
+                                <li><a href="#">Class Management</a></li>
+                                <li><a href="#">Subjects</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a href="#" class="side-nav-link">
+                            <i class="uil-file-info-alt"></i>
+                            <span> Learning Materials </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a href="#" class="side-nav-link">
+                            <i class="uil-edit-alt"></i>
+                            <span> Assignments </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a href="#" class="side-nav-link">
+                            <i class="uil-clipboard-alt"></i>
+                            <span> Exams </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a href="#" class="side-nav-link">
+                            <i class="uil-chart-bar"></i>
+                            <span> Reports </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-title">System Settings</li>
+
+                    <li class="side-nav-item">
+                        <a data-bs-toggle="collapse" href="#sidebarSettings" aria-expanded="false"
+                            aria-controls="sidebarSettings" class="side-nav-link">
+                            <i class="uil-cog"></i>
+                            <span> Settings </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarSettings">
+                            <ul class="side-nav-second-level">
+                                <li><a href="#">User Management</a></li>
+                                <li><a href="#">System Config</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                </ul>
+                <!--- End Sidemenu -->
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <!--- End Sidemenu -->
+
+        <div class="clearfix"></div>
+    </div>
+</div>
