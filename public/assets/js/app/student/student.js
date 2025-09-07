@@ -2,11 +2,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Endpoint API
     const API_URL = '/api/students';
 
+    // Inisialisasi DataTable
     if ($.fn.DataTable.isDataTable('#studentTable')) {
         $('#studentTable').DataTable().destroy();
     }
 
     const studentTable = $('#studentTable').DataTable({
+        // ... (konfigurasi DataTable lainnya)
         ...getTableConfig('#studentTable'),
         processing: true,
         ajax: {
@@ -32,41 +34,31 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         columns: [
-            {
-                data: null,
-                render: (data, type, row, meta) => meta.row + 1
-            },
-            {
-                data: 'name',
-                defaultContent: '-'
-            },
-            {
-                data: 'email',
-                defaultContent: '-'
-            },
-            {
-                data: 'gender',
-                defaultContent: '-'
-            },
-            {
-                data: 'grade_level',
-                defaultContent: '-'
-            },
+            { data: null, render: (data, type, row, meta) => meta.row + 1 },
+            { data: 'nisn', defaultContent: '-' },
+            { data: 'name', defaultContent: '-' },
+            { data: 'gender', defaultContent: '-' },
+            { data: 'grade_level', defaultContent: '-' },
+            { data: 'enrollment_date', defaultContent: '-' },
             {
                 data: null,
                 orderable: false,
                 render: function (data, type, row) {
+                    const majorLevel = row.major ? row.major.level : '';
                     return `
                         <button class="btn btn-sm btn-warning edit-btn"
                             data-id="${row.id}"
                             data-name="${row.name}"
                             data-email="${row.email}"
+                            data-nisn="${row.nisn}"
                             data-date-of-birth="${row.date_of_birth}"
                             data-gender="${row.gender}"
                             data-phone-number="${row.phone_number}"
                             data-address="${row.address}"
                             data-enrollment-date="${row.enrollment_date}"
-                            data-grade-level="${row.grade_level}">
+                            data-grade-level = "${row.grade_level}"
+                            data-major-id = "${row.major ? row.major.id : ''}"
+                            data-major-level = "${majorLevel}"
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn"
@@ -80,31 +72,56 @@ document.addEventListener('DOMContentLoaded', function () {
         ]
     });
 
-    // Handle Add New Student button
+    // Menangani klik tombol "Add New Student"
     $('#studentAddBtn').on('click', function () {
         $('#studentModalLabel').text('👤 Add New Student');
-        $('#studentId').val(''); // Clear hidden ID field
-        $('#createStudentForm')[0].reset(); // Reset form properly
+        $('#studentId').val(''); // Hapus ID yang tersembunyi
+        $('#createStudentForm')[0].reset(); // Reset form
+
+        // Secara default, field Major dinonaktifkan saat menambah siswa baru
+        $('#studentMajorField').prop('disabled', true);
+        // Pastikan grup field major terlihat, tidak disembunyikan
+        $('#studentMajorFieldGroup').removeClass('d-none');
+
         $('#studentModal').modal('show');
     });
 
-    // Handle Edit button - Fixed class selector
+    // Menangani klik tombol "Edit"
     $(document).on('click', '.edit-btn', function () {
         const data = $(this).data();
-        $('#studentModalLabel').text('✏️ Edit Student'); // Fixed modal label
+        $('#studentModalLabel').text('✏️ Edit Student');
         $('#studentId').val(data.id);
         $('#studentName').val(data.name);
         $('#studentEmail').val(data.email);
-        $('#studentPassword').val(''); // Don't fill password for edit
+        $('#studentNisn').val(data.nisn);
+        $('#studentPassword').val('');
         $('#studentDateOfBirth').val(data.dateOfBirth);
         $('#studentGender').val(data.gender);
         $('#studentPhoneNumber').val(data.phoneNumber);
         $('#studentAddress').val(data.address);
-        $('#enrollmentDate').val(data.enrollmentDate);
-        $('#gradeLevel').val(data.gradeLevel);
+        $('#studentEnrollmentDate').val(data.enrollmentDate);
+        $('#studentGradeLevel').val(data.gradeLevel);
+
+        const majorId = data.majorId;
+        const majorLevel = data.majorLevel;
+        $('#studentMajorLevel').val(majorLevel);
+
+        // Pastikan grup field major terlihat
+        $('#studentMajorFieldGroup').removeClass('d-none');
+
+        // Atur status disabled berdasarkan level
+        if (majorLevel && (majorLevel === 'senior_high_general' || majorLevel === 'senior_high_vocational')) {
+            $('#studentMajorField').prop('disabled', false); // Aktifkan jika SMA/SMK
+            fetchMajors(majorLevel, majorId);
+        } else {
+            $('#studentMajorField').prop('disabled', true); // Nonaktifkan jika bukan SMA/SMK
+            $('#studentMajorField').empty().append('<option value="">Select Major</option>');
+        }
+
         $('#studentModal').modal('show');
     });
 
+    // ... (kode untuk delete, form submit)
     // Handle Delete button - Fixed class selector
     $(document).on('click', '.delete-btn', function () {
         const studentId = $(this).data('id');
@@ -142,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 'The student has been deleted.',
                                 'success'
                             );
-                            studentTable.ajax.reload(null, false); // Fixed table variable name
+                            studentTable.ajax.reload(null, false);
                         } else {
                             Swal.fire(
                                 'Failed!',
@@ -163,13 +180,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Handle Form Submit - Fixed form ID and URL logic
+    // Handle Form Submit
     $('#createStudentForm').on('submit', function (e) {
         e.preventDefault();
 
-        const studentId = $('#studentId').val(); // Get ID from hidden input
+        const studentId = $('#studentId').val();
         const method = studentId ? 'PUT' : 'POST';
-        const url = studentId ? `${API_URL}/${studentId}` : API_URL; // Fixed URL logic
+        const url = studentId ? `${API_URL}/${studentId}` : API_URL;
 
         $.ajax({
             url: url,
@@ -199,5 +216,55 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Menangani perubahan dropdown Education Level
+    $('#studentMajorLevel').on('change', function (e) {
+        const selectedLevel = $(this).val();
+
+        // Aktifkan atau nonaktifkan field Major berdasarkan pilihan
+        const isHighSchool = selectedLevel === 'senior_high_general' || selectedLevel === 'senior_high_vocational';
+        $('#studentMajorField').prop('disabled', !isHighSchool);
+
+        // Pastikan field major selalu terlihat
+        $('#studentMajorFieldGroup').removeClass('d-none');
+
+        // Jika SMA atau SMK, muat data jurusan
+        if (isHighSchool) {
+            fetchMajors(selectedLevel);
+        } else {
+            // Jika tidak, kosongkan dan reset ke "Select Major"
+            $('#studentMajorField').empty().append('<option value="">Select Major</option>');
+        }
+    });
+
+    // Fungsi untuk mengambil data jurusan
+    function fetchMajors(level, majorId = null) {
+        $.ajax({
+            url: `/api/majors?level=${level}`,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.success) {
+                    $('#studentMajorField').empty().append('<option value="">Select Major</option>');
+                    $.each(res.data, function (i, major) {
+                        $('#studentMajorField').append($('<option>', {
+                            value: major.id,
+                            text: major.name
+                        }));
+                    });
+
+                    if (majorId) {
+                        $('#studentMajorField').val(majorId);
+                    }
+                } else {
+                    $('#studentMajorField').empty().append(`<option value="">${res.message}</option>`);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Failed to fetch majors:', textStatus, errorThrown);
+                $('#studentMajorField').empty().append('<option value="">Failed to load majors</option>');
+            }
+        });
+    }
 
 });

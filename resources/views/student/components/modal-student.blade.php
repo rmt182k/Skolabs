@@ -1,5 +1,5 @@
 <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white border-0 rounded-top-3 p-4">
                 <h5 class="modal-title fw-bold" id="studentModalLabel"></h5>
@@ -19,6 +19,13 @@
                         <input type="email" class="form-control" id="studentEmail" name="email" required>
                         <div class="invalid-feedback"></div>
                     </div>
+                    <div class="col-md-6">
+                        <label for="studentNisn" class="form-label">NISN</label>
+                        <input type="text" class="form-control" id="studentNisn" name="nisn" required
+                            maxlength="20">
+                        <div class="invalid-feedback"></div>
+                    </div>
+
                     <div class="col-md-6">
                         <label for="studentPassword" class="form-label">Password</label>
                         <input type="password" class="form-control" id="studentPassword" name="password" required>
@@ -40,18 +47,15 @@
                         <label for="studentPhoneNumber" class="form-label">Phone Number</label>
                         <input type="text" class="form-control" id="studentPhoneNumber" name="phone_number">
                     </div>
-                    <div class="col-md-12">
-                        <label for="studentAddress" class="form-label">Address</label>
-                        <textarea class="form-control" id="studentAddress" name="address" rows="3"></textarea>
-                    </div>
                     <div class="col-md-6">
-                        <label for="enrollmentDate" class="form-label">Enrollment Date</label>
-                        <input type="date" class="form-control" id="enrollmentDate" name="enrollment_date">
+                        <label for="studentEnrollmentDate" class="form-label">Enrollment Date</label>
+                        <input type="date" class="form-control" id="studentEnrollmentDate" name="enrollment_date">
                     </div>
+
                     <div class="col-md-6">
-                        <label for="gradeLevel" class="form-label">Grade Level</label>
-                        <select class="form-select" id="gradeLevel" name="grade_level">
-                            <option selected disabled value="">Please Select</option>
+                        <label for="studentGradeLevel" class="form-label">Grade Level</label>
+                        <select class="form-select" id="studentGradeLevel" name="grade_level" required>
+                            <option value="">Select Grade</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -65,13 +69,40 @@
                             <option value="11">11</option>
                             <option value="12">12</option>
                         </select>
+                        <div class="invalid-feedback"></div>
                     </div>
+
+                    <div class="col-md-6">
+                        <label for="studentMajorLevel" class="form-label">Education Level</label>
+                        <select class="form-select" id="studentMajorLevel" name="education_level" required>
+                            <option value="">Select Level</option>
+                            <option value="elementary_school">Elementary School (SD)</option>
+                            <option value="junior_high">Junior High School (SMP)</option>
+                            <option value="senior_high_general">Senior High School (SMA)</option>
+                            <option value="senior_high_vocational">Senior High School (SMK)</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-6 d-none" id="studentMajorFieldGroup">
+                        <label for="studentMajorField" class="form-label">Major</label>
+                        <select class="form-select" id="studentMajorField" name="major_id">
+                            <option value="">Select Major</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="studentAddress" class="form-label">Address</label>
+                        <textarea class="form-control" id="studentAddress" name="address" rows="3"></textarea>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer p-3 border-0 rounded-bottom-3">
                 <button type="button" class="btn btn-outline-secondary px-4 me-2"
                     data-bs-dismiss="modal">Close</button>
-                <button type="submit" id="saveStudentBtn" form="createStudentForm" class="btn btn-primary px-4">Save Student</button>
+                <button type="submit" id="saveStudentBtn" form="createStudentForm"
+                    class="btn btn-primary px-4">Save Student</button>
             </div>
         </div>
     </div>

@@ -18,7 +18,8 @@
         <!-- Leftbar User -->
         <div class="leftbar-user">
             <a href="pages-profile.html">
-                <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42" class="rounded-circle shadow-sm">
+                <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42"
+                    class="rounded-circle shadow-sm">
                 <span class="leftbar-user-name mt-2">{{ Auth::user()->name }}</span>
             </a>
         </div>
@@ -104,6 +105,7 @@
                         </a>
                         <div class="collapse" id="sidebarClasses">
                             <ul class="side-nav-second-level">
+                                <li><a href="/major">Majors</a></li>
                                 <li><a href="#">Class Management</a></li>
                                 <li><a href="#">Subjects</a></li>
                             </ul>

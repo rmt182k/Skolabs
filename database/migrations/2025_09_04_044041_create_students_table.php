@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->text('address')->nullable();
             $table->date('enrollment_date')->nullable();
             $table->integer('grade_level')->nullable();
+            $table->integer('major_id')->nullable();
             $table->timestamps();
         });
     }

@@ -23,16 +23,22 @@ class StudentController extends Controller
                     'students.id',
                     'users.name',
                     'users.email',
+                    'students.nisn',
                     'students.date_of_birth',
                     'students.gender',
                     'students.phone_number',
                     'students.address',
                     'students.enrollment_date',
                     'students.grade_level',
+                    'students.major_id',
+                    'majors.level as major_level',
+                    'majors.name as major_name',
+                    'majors.description as major_description',
                     'students.created_at',
                     'students.updated_at'
                 )
                 ->join('users', 'students.user_id', '=', 'users.id')
+                ->leftJoin('majors', 'students.major_id', '=', 'majors.id')
                 ->get();
 
             if ($students->isEmpty()) {
@@ -48,12 +54,19 @@ class StudentController extends Controller
                     'id' => $student->id,
                     'name' => $student->name,
                     'email' => $student->email,
+                    'nisn' => $student->nisn,
                     'date_of_birth' => $student->date_of_birth,
                     'gender' => $student->gender,
                     'phone_number' => $student->phone_number,
                     'address' => $student->address,
                     'enrollment_date' => $student->enrollment_date,
                     'grade_level' => $student->grade_level,
+                    'major' => [
+                        'id' => $student->major_id,
+                        'level' => $student->major_level,
+                        'name' => $student->major_name,
+                        'description' => $student->major_description,
+                    ],
                     'created_at' => $student->created_at,
                     'updated_at' => $student->updated_at
                 ];
@@ -69,7 +82,6 @@ class StudentController extends Controller
             Log::error('Error fetching students: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                // 'message' => 'Failed to retrieve students. Please try again later.'
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -83,6 +95,7 @@ class StudentController extends Controller
                     'students.id',
                     'users.name',
                     'users.email',
+                    'students.nisn',
                     'students.date_of_birth',
                     'students.gender',
                     'students.phone_number',
@@ -107,6 +120,7 @@ class StudentController extends Controller
                 'id' => $student->id,
                 'name' => $student->name,
                 'email' => $student->email,
+                'nisn' => $student->nisn,
                 'date_of_birth' => $student->date_of_birth,
                 'gender' => $student->gender,
                 'phone_number' => $student->phone_number,
@@ -139,12 +153,14 @@ class StudentController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:8',
+                'nisn' => 'required|string|max:20|unique:students,nisn',
                 'date_of_birth' => 'nullable|date',
                 'gender' => 'nullable|in:male,female,Other',
                 'phone_number' => 'nullable|string|max:15',
                 'address' => 'nullable|string',
                 'enrollment_date' => 'nullable|date',
-                'grade_level' => 'nullable|integer'
+                'grade_level' => 'nullable|integer',
+                'major_id' => 'nullable|integer'
             ]);
 
             DB::beginTransaction();
@@ -176,12 +192,14 @@ class StudentController extends Controller
 
             $student = new Student();
             $student->user_id = $user->id;
+            $student->nisn = $validatedData['nisn']; // Simpan nisn
             $student->date_of_birth = $validatedData['date_of_birth'] ?? null;
             $student->gender = $validatedData['gender'] ?? null;
             $student->phone_number = $validatedData['phone_number'] ?? null;
             $student->address = $validatedData['address'] ?? null;
             $student->enrollment_date = $validatedData['enrollment_date'] ?? null;
             $student->grade_level = $validatedData['grade_level'] ?? null;
+            $student->major_id = $validatedData['major_id'] ?? null;
             $student->save();
 
             DB::commit();
@@ -190,12 +208,14 @@ class StudentController extends Controller
                 'id' => $student->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'nisn' => $student->nisn,
                 'date_of_birth' => $student->date_of_birth,
                 'gender' => $student->gender,
                 'phone_number' => $student->phone_number,
                 'address' => $student->address,
                 'enrollment_date' => $student->enrollment_date,
                 'grade_level' => $student->grade_level,
+                'major_id' => $student->major_id,
                 'created_at' => $student->created_at,
                 'updated_at' => $student->updated_at
             ];
@@ -218,7 +238,6 @@ class StudentController extends Controller
             Log::error('Error creating student: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                // 'message' => 'Failed to create student. Please try again later.'
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -247,12 +266,14 @@ class StudentController extends Controller
                 'name' => 'sometimes|required|string|max:255',
                 'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
                 'password' => 'sometimes|required|string|min:8',
+                'nisn' => 'sometimes|required|string|max:20|unique:students,nisn,' . $student->id, // Validasi untuk nisn
                 'date_of_birth' => 'nullable|date',
                 'gender' => 'nullable|in:male,female,Other',
                 'phone_number' => 'nullable|string|max:15',
                 'address' => 'nullable|string',
                 'enrollment_date' => 'nullable|date',
-                'grade_level' => 'nullable|integer'
+                'grade_level' => 'nullable|integer',
+                'major_id' => 'nullable|integer'
             ]);
 
             DB::beginTransaction();
@@ -272,6 +293,9 @@ class StudentController extends Controller
             }
 
             $studentUpdateData = [];
+            if (isset($validatedData['nisn'])) {
+                $studentUpdateData['nisn'] = $validatedData['nisn']; // Update nisn
+            }
             if (isset($validatedData['date_of_birth'])) {
                 $studentUpdateData['date_of_birth'] = $validatedData['date_of_birth'];
             }
@@ -290,24 +314,28 @@ class StudentController extends Controller
             if (isset($validatedData['grade_level'])) {
                 $studentUpdateData['grade_level'] = $validatedData['grade_level'];
             }
+            if (isset($validatedData['major_id'])) {
+                $studentUpdateData['major_id'] = $validatedData['major_id'];
+            }
             if (!empty($studentUpdateData)) {
                 DB::table('students')->where('id', '=', $student->id)->update($studentUpdateData);
             }
 
             DB::commit();
 
-            // Ambil data terbaru untuk response
             $updatedStudent = DB::table('students')
                 ->select(
                     'students.id',
                     'users.name',
                     'users.email',
+                    'students.nisn',
                     'students.date_of_birth',
                     'students.gender',
                     'students.phone_number',
                     'students.address',
                     'students.enrollment_date',
                     'students.grade_level',
+                    'students.major_id',
                     'students.created_at',
                     'students.updated_at'
                 )
@@ -319,12 +347,14 @@ class StudentController extends Controller
                 'id' => $updatedStudent->id,
                 'name' => $updatedStudent->name,
                 'email' => $updatedStudent->email,
+                'nisn' => $updatedStudent->nisn,
                 'date_of_birth' => $updatedStudent->date_of_birth,
                 'gender' => $updatedStudent->gender,
                 'phone_number' => $updatedStudent->phone_number,
                 'address' => $updatedStudent->address,
                 'enrollment_date' => $updatedStudent->enrollment_date,
                 'grade_level' => $updatedStudent->grade_level,
+                'major_id' => $updatedStudent->major_id,
                 'created_at' => $updatedStudent->created_at,
                 'updated_at' => $updatedStudent->updated_at
             ];
