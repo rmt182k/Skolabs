@@ -1,7 +1,5 @@
 # Skolabs: An Open-Source Solution for School Learning Management 🏫
 
-\!([https://images.unsplash.com/photo-1541339907198-e08756314053?crop=entropy\&cs=tinysrgb\&fit=max\&fm=jpg\&ixid=M3w1MDcxMzJ8MHwxfHNlYXJjaHw1fHxzdHVkZW50JTIwc3R1ZHlpbmclMjB3aXRoJTIwbGFwdG9wfGVufDB8fHx8MTY5OTU1NDkwMXww\&ixlib=rb-4.0.3\&q=80\&w=1080](https://www.google.com/search?q=https://images.unsplash.com/photo-1541339907198-e08756314053%3Fcrop%3Dentropy%26cs%3Dtinysrgb%26fit%3Dmax%26fm%3Djpg%26ixid%3DM3w1MDcxMzJ8MHwxfHNlYXJjaHw1fHxzdHVkZW50JTIwc3R1ZHlpbmclMjB3aXRoJTIwbGFwdG9wfGVufDB8fHx8MTY5OTU1NDkwMXww%26ixlib%3Drb-4.0.3%26q%3D80%26w%3D1080))
-
 **Skolabs** is an open-source Learning Management System (LMS) designed specifically to help schools manage their teaching and learning processes digitally. Skolabs provides a complete, flexible, and easy-to-use solution for schools that need a modern LMS in this digital era.
 
 -----
