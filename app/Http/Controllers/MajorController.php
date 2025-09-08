@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class MajorController extends Controller
 {
@@ -21,10 +22,21 @@ class MajorController extends Controller
     {
         try {
             $educationalLevelId = $request->query('educational_level_id');
-            $query = Major::with('educationalLevel');
+
+            $query = DB::table('majors')
+                ->select(
+                    'majors.id',
+                    'majors.name',
+                    'majors.description',
+                    'majors.educational_level_id',
+                    'educational_levels.name as educational_level_name',
+                    'majors.created_at',
+                    'majors.updated_at'
+                )
+                ->join('educational_levels', 'majors.educational_level_id', '=', 'educational_levels.id');
 
             if ($educationalLevelId) {
-                $query->where('educational_level_id', $educationalLevelId);
+                $query->where('majors.educational_level_id', $educationalLevelId);
             }
 
             $majors = $query->get();
@@ -61,7 +73,7 @@ class MajorController extends Controller
     public function show($id)
     {
         try {
-            $major = Major::with('educationalLevel')->find($id);
+            $major = Major::find($id);
 
             if (!$major) {
                 return response()->json([
@@ -105,7 +117,7 @@ class MajorController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Major created successfully.',
-                'data' => $major->load('educationalLevel')
+                'data' => $major
             ], 201);
 
         } catch (ValidationException $e) {
@@ -118,10 +130,11 @@ class MajorController extends Controller
             Log::error('Error creating major: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create major. Please try again later.'
+                'message' => 'Failed to create major. ' . $e->getMessage()
             ], 500);
         }
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -153,7 +166,7 @@ class MajorController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Major updated successfully.',
-                'data' => $major->load('educationalLevel')
+                'data' => $major
             ], 200);
 
         } catch (ValidationException $e) {

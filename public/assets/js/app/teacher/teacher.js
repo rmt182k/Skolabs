@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const teacherTable = $('#teachers-datatable').DataTable({
         // ... (other DataTable configurations)
-        ...getTableConfig('#teachers-datatable'),
+        // ...getTableConfig('#teachers-datatable'), // Pastikan fungsi ini ada jika Anda menggunakannya
         processing: true,
-        serverSide: true,
+        // serverSide: true, // Hapus atau sesuaikan ini jika data Anda tidak besar
         ajax: {
             url: API_URL,
             dataSrc: function (json) {
@@ -46,23 +46,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: null,
                 orderable: false,
                 render: function (data, type, row) {
+                    // Tombol edit sekarang hanya butuh data-id
                     return `
                         <button class="btn btn-sm btn-warning edit-btn"
-                            data-id="${row.id}"
-                            data-user-id="${row.user_id}"
-                            data-name="${row.name}"
-                            data-email="${row.email}"
-                            data-employee-id="${row.employee_id}"
-                            data-date-of-birth="${row.date_of_birth}"
-                            data-phone-number="${row.phone_number}"
-                            data-address="${row.address}"
-                            data-gender="${row.gender}"
-                            data-status="${row.status}">
+                            data-id="${row.id}">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         <button class="btn btn-sm btn-danger delete-btn"
                             data-id="${row.id}"
-                            data-name="${row.user ? row.user.name : 'Unknown'}">
+                            data-name="${row.name}">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     `;
@@ -79,22 +71,41 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#teacherModal').modal('show');
     });
 
-    // Handle "Edit" button click
+    // Handle "Edit" button click - **BAGIAN INI YANG DIPERBARUI**
     $(document).on('click', '.edit-btn', function () {
-        const data = $(this).data();
-        $('#teacherModalLabel').text('✏️ Edit Teacher');
-        $('#teacherId').val(data.id);
-        $('#userId').val(data.userId);
-        $('#teacherName').val(data.name);
-        $('#teacherEmail').val(data.email);
-        $('#teacherEmployeeId').val(data.employeeId);
-        $('#teacherDateOfBirth').val(data.dateOfBirth);
-        $('#teacherPhoneNumber').val(data.phoneNumber);
-        $('#teacherAddress').val(data.address);
-        $('#teacherGender').val(data.gender).trigger('change');
-        $('#teacherStatus').val(data.status).trigger('change');
+        const teacherId = $(this).data('id');
 
-        $('#teacherModal').modal('show');
+        // Lakukan AJAX call untuk mendapatkan data guru terbaru
+        $.ajax({
+            url: `${API_URL}/${teacherId}`,
+            method: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    const data = response.data;
+
+                    // Isi form modal dengan data dari response AJAX
+                    $('#teacherModalLabel').text('✏️ Edit Teacher');
+                    $('#teacherId').val(data.id);
+                    $('#userId').val(data.user_id);
+                    $('#teacherName').val(data.name);
+                    $('#teacherEmail').val(data.email); // Pastikan response API menyertakan email
+                    $('#teacherEmployeeId').val(data.employee_id);
+                    $('#teacherDateOfBirth').val(data.date_of_birth);
+                    $('#teacherPhoneNumber').val(data.phone_number);
+                    $('#teacherAddress').val(data.address);
+                    $('#teacherGender').val(data.gender);
+                    $('#teacherStatus').val(data.status);
+
+                    // Tampilkan modal setelah form terisi
+                    $('#teacherModal').modal('show');
+                } else {
+                    Swal.fire('Error!', response.message || 'Teacher data not found.', 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('Error!', 'Failed to fetch teacher data.', 'error');
+            }
+        });
     });
 
     // Handle "Delete" button click
@@ -112,44 +123,21 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`${API_URL}/${teacherId}`, {
+                $.ajax({
+                    url: `${API_URL}/${teacherId}`,
                     method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                        'Accept': 'application/json'
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire('Deleted!', 'The teacher has been deleted.', 'success');
+                            teacherTable.ajax.reload(null, false);
+                        } else {
+                            Swal.fire('Failed!', response.message || 'Failed to delete teacher.', 'error');
+                        }
                     },
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`Network response was not ok: ${response.status} ${text}`);
-                        });
+                    error: function () {
+                        Swal.fire('Error!', 'An error occurred while deleting the teacher.', 'error');
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire(
-                            'Deleted!',
-                            'The teacher has been deleted.',
-                            'success'
-                        );
-                        teacherTable.ajax.reload(null, false);
-                    } else {
-                        Swal.fire(
-                            'Failed!',
-                            data.message || 'Failed to delete teacher.',
-                            'error'
-                        );
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: `An error occurred: ${error.message}`,
-                    });
-                    console.error('Error deleting teacher:', error);
                 });
             }
         });

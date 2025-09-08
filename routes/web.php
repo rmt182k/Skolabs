@@ -46,8 +46,10 @@ Route::group(['auth', 'verified'], function () {
     Route::get('/api/educational-levels', [EducationalLevelController::class, 'index'])->name('educational-levels.index');
     Route::get('/api/educational-levels/{id}', [EducationalLevelController::class, 'show'])->name('educational-levels.show');
     Route::post('api/educational-levels', [EducationalLevelController::class, 'store'])->name('educational-levels.store');
+    Route::put('/api/educational-levels/{id}', [EducationalLevelController::class, 'update'])->name('educational-levels.update');
 
     Route::get('/api/majors', [MajorController::class, 'index'])->name('majors.index');
     Route::get('/api/majors/{id}', [MajorController::class, 'show'])->name('majors.show');
-    Route::post('api/majors', [MajorController::class, 'store'])->name('majors.store');
+    Route::post('/api/majors', [MajorController::class, 'store'])->name('majors.store');
+    Route::put('/api/majors/{id}', [MajorController::class, 'update'])->name('majors.update');
 });

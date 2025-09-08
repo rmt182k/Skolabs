@@ -49,44 +49,32 @@
                     </div>
                     <div class="col-md-6">
                         <label for="studentEnrollmentDate" class="form-label">Enrollment Date</label>
-                        <input type="date" class="form-control" id="studentEnrollmentDate" name="enrollment_date">
+                        <input type="date" class="form-control" id="studentEnrollmentDate"
+                            name="enrollment_date">
                     </div>
 
                     <div class="col-md-6">
                         <label for="studentGradeLevel" class="form-label">Grade Level</label>
                         <select class="form-select" id="studentGradeLevel" name="grade_level" required>
                             <option value="">Select Grade</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
+                            @for ($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
 
                     <div class="col-md-6">
                         <label for="studentMajorLevel" class="form-label">Education Level</label>
-                        <select class="form-select" id="studentMajorLevel" name="education_level" required>
+                        <select class="form-select" id="studentMajorLevel" name="educational_level_id" required>
                             <option value="">Select Level</option>
-                            <option value="elementary_school">Elementary School (SD)</option>
-                            <option value="junior_high">Junior High School (SMP)</option>
-                            <option value="senior_high_general">Senior High School (SMA)</option>
-                            <option value="senior_high_vocational">Senior High School (SMK)</option>
                         </select>
                         <div class="invalid-feedback"></div>
                     </div>
 
-                    <div class="col-md-6 d-none" id="studentMajorFieldGroup">
+                    <div class="col-md-6" id="studentMajorFieldGroup">
                         <label for="studentMajorField" class="form-label">Major</label>
-                        <select class="form-select" id="studentMajorField" name="major_id">
+                        <select class="form-select" id="studentMajorField" name="major_id" disabled>
                             <option value="">Select Major</option>
                         </select>
                     </div>
@@ -95,7 +83,6 @@
                         <label for="studentAddress" class="form-label">Address</label>
                         <textarea class="form-control" id="studentAddress" name="address" rows="3"></textarea>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer p-3 border-0 rounded-bottom-3">

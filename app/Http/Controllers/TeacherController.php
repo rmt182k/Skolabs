@@ -4,25 +4,19 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Role;
-use App\Models\Teacher;
-use App\Models\User;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TeacherController extends Controller
 {
     public function index()
     {
         try {
-            // Use DB::table with a join to retrieve teacher and user data
             $teachers = DB::table('teachers')
-                ->join('users', 'teachers.user_id', '=', 'users.id')
                 ->select(
                     'teachers.id',
                     'users.name',
@@ -34,27 +28,14 @@ class TeacherController extends Controller
                     'teachers.gender',
                     'teachers.address'
                 )
+                ->join('users', 'teachers.user_id', '=', 'users.id')
                 ->orderBy('teachers.created_at', 'DESC')
                 ->get();
-
-            $formattedData = $teachers->map(function ($teacher) {
-                return [
-                    'id' => $teacher->id,
-                    'name' => $teacher->name,
-                    'email' => $teacher->email,
-                    'employee_id' => $teacher->employee_id,
-                    'status' => $teacher->status,
-                    'phone_number' => $teacher->phone_number,
-                    'date_of_birth' => $teacher->date_of_birth,
-                    'gender' => $teacher->gender,
-                    'address' => $teacher->address,
-                ];
-            });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Teachers retrieved successfully.',
-                'data' => $formattedData
+                'data' => $teachers
             ], 200);
 
         } catch (Exception $e) {
@@ -70,8 +51,6 @@ class TeacherController extends Controller
     {
         try {
             $teacher = DB::table('teachers')
-                ->join('users', 'teachers.user_id', '=', 'users.id')
-                ->where('teachers.id', $id)
                 ->select(
                     'teachers.id',
                     'teachers.user_id',
@@ -86,31 +65,18 @@ class TeacherController extends Controller
                     'teachers.created_at',
                     'teachers.updated_at'
                 )
+                ->join('users', 'teachers.user_id', '=', 'users.id')
+                ->where('teachers.id', $id)
                 ->first();
 
             if (!$teacher) {
                 return response()->json(['success' => false, 'message' => 'Teacher not found.'], 404);
             }
 
-            $formattedData = [
-                'id' => $teacher->id,
-                'user_id' => $teacher->user_id,
-                'name' => $teacher->name,
-                'email' => $teacher->email,
-                'employee_id' => $teacher->employee_id,
-                'date_of_birth' => $teacher->date_of_birth,
-                'gender' => $teacher->gender,
-                'phone_number' => $teacher->phone_number,
-                'address' => $teacher->address,
-                'status' => $teacher->status,
-                'created_at' => $teacher->created_at,
-                'updated_at' => $teacher->updated_at
-            ];
-
             return response()->json([
                 'success' => true,
                 'message' => 'Teacher retrieved successfully.',
-                'data' => $formattedData
+                'data' => $teacher
             ], 200);
 
         } catch (Exception $e) {
@@ -135,44 +101,46 @@ class TeacherController extends Controller
                 'status' => 'nullable|in:active,inactive',
             ]);
 
-            // Set default password if the field is empty or not provided
             $password = $validatedData['password'] ?? 'password';
 
-            $user = User::create([
+            $userId = DB::table('users')->insertGetId([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($password),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             $role = Role::firstOrCreate(['name' => 'teacher'], ['description' => 'Default role for teachers']);
-            UserRole::create(['user_id' => $user->id, 'role_id' => $role->id]);
+            UserRole::create(['user_id' => $userId, 'role_id' => $role->id]);
 
-            $teacher = Teacher::create([
-                'user_id' => $user->id,
+            $teacherId = DB::table('teachers')->insertGetId([
+                'user_id' => $userId,
                 'employee_id' => $validatedData['employee_id'],
                 'date_of_birth' => $validatedData['date_of_birth'] ?? null,
                 'gender' => $validatedData['gender'] ?? null,
                 'phone_number' => $validatedData['phone_number'] ?? null,
                 'address' => $validatedData['address'] ?? null,
                 'status' => $validatedData['status'] ?? 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             DB::commit();
 
-            $teacher->load('user');
             $formattedData = [
-                'id' => $teacher->id,
-                'user_id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'employee_id' => $teacher->employee_id,
-                'date_of_birth' => $teacher->date_of_birth,
-                'gender' => $teacher->gender,
-                'phone_number' => $teacher->phone_number,
-                'address' => $teacher->address,
-                'status' => $teacher->status,
-                'created_at' => $teacher->created_at,
-                'updated_at' => $teacher->updated_at
+                'id' => $teacherId,
+                'user_id' => $userId,
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'employee_id' => $validatedData['employee_id'],
+                'date_of_birth' => $validatedData['date_of_birth'] ?? null,
+                'gender' => $validatedData['gender'] ?? null,
+                'phone_number' => $validatedData['phone_number'] ?? null,
+                'address' => $validatedData['address'] ?? null,
+                'status' => $validatedData['status'] ?? 'active',
+                'created_at' => now()->toDateTimeString(),
+                'updated_at' => now()->toDateTimeString()
             ];
 
             return response()->json(['success' => true, 'message' => 'Teacher created successfully.', 'data' => $formattedData], 201);
@@ -182,38 +150,32 @@ class TeacherController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error creating teacher: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    /**
-     * Mengupdate data guru yang ada.
-     */
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
-            $teacher = DB::table('teachers')->where('id', '=', $id)->first();
+            $teacher = DB::table('teachers')->where('id', $id)->first();
             if (!$teacher) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Teacher not found.'
-                ], 404);
+                return response()->json(['success' => false, 'message' => 'Teacher not found.'], 404);
             }
 
-            $user = DB::table('users')->where('id', '=', $teacher->user_id)->first();
+            $user = DB::table('users')->where('id', $teacher->user_id)->first();
             if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Associated user not found.'
-                ], 404);
+                return response()->json(['success' => false, 'message' => 'Associated user not found.'], 404);
             }
 
             $validatedData = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
                 'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
                 'employee_id' => 'sometimes|required|string|max:50|unique:teachers,employee_id,' . $teacher->id,
-                'password' => 'nullable|string|min:8|confirmed',
+                'password' => 'nullable|string|min:8',
                 'date_of_birth' => 'nullable|date',
                 'gender' => 'nullable|in:male,female',
                 'phone_number' => 'nullable|string|max:20',
@@ -222,40 +184,35 @@ class TeacherController extends Controller
             ]);
 
             $userUpdateData = [];
-            if (isset($validatedData['name'])) {
+            if ($request->has('name'))
                 $userUpdateData['name'] = $validatedData['name'];
-            }
-            if (isset($validatedData['email'])) {
+            if ($request->has('email'))
                 $userUpdateData['email'] = $validatedData['email'];
-            }
-            if (isset($validatedData['password'])) {
+            if ($request->filled('password'))
                 $userUpdateData['password'] = Hash::make($validatedData['password']);
-            }
+
             if (!empty($userUpdateData)) {
-                DB::table('users')->where('id', '=', $user->id)->update($userUpdateData);
+                $userUpdateData['updated_at'] = now();
+                DB::table('users')->where('id', $user->id)->update($userUpdateData);
             }
 
             $teacherUpdateData = [];
-            if (isset($validatedData['employee_id'])) {
+            if ($request->has('employee_id'))
                 $teacherUpdateData['employee_id'] = $validatedData['employee_id'];
-            }
-            if (isset($validatedData['date_of_birth'])) {
+            if ($request->has('date_of_birth'))
                 $teacherUpdateData['date_of_birth'] = $validatedData['date_of_birth'];
-            }
-            if (isset($validatedData['gender'])) {
+            if ($request->has('gender'))
                 $teacherUpdateData['gender'] = $validatedData['gender'];
-            }
-            if (isset($validatedData['phone_number'])) {
+            if ($request->has('phone_number'))
                 $teacherUpdateData['phone_number'] = $validatedData['phone_number'];
-            }
-            if (isset($validatedData['address'])) {
+            if ($request->has('address'))
                 $teacherUpdateData['address'] = $validatedData['address'];
-            }
-            if (isset($validatedData['status'])) {
+            if ($request->has('status'))
                 $teacherUpdateData['status'] = $validatedData['status'];
-            }
+
             if (!empty($teacherUpdateData)) {
-                DB::table('teachers')->where('id', '=', $teacher->id)->update($teacherUpdateData);
+                $teacherUpdateData['updated_at'] = now();
+                DB::table('teachers')->where('id', $id)->update($teacherUpdateData);
             }
 
             DB::commit();
@@ -276,25 +233,10 @@ class TeacherController extends Controller
                     'teachers.updated_at'
                 )
                 ->join('users', 'teachers.user_id', '=', 'users.id')
-                ->where('teachers.id', '=', $id)
+                ->where('teachers.id', $id)
                 ->first();
 
-            $formattedData = [
-                'id' => $updatedTeacher->id,
-                'user_id' => $updatedTeacher->user_id,
-                'name' => $updatedTeacher->name,
-                'email' => $updatedTeacher->email,
-                'employee_id' => $updatedTeacher->employee_id,
-                'date_of_birth' => $updatedTeacher->date_of_birth,
-                'gender' => $updatedTeacher->gender,
-                'phone_number' => $updatedTeacher->phone_number,
-                'address' => $updatedTeacher->address,
-                'status' => $updatedTeacher->status,
-                'created_at' => $updatedTeacher->created_at,
-                'updated_at' => $updatedTeacher->updated_at
-            ];
-
-            return response()->json(['success' => true, 'message' => 'Teacher updated successfully.', 'data' => $formattedData]);
+            return response()->json(['success' => true, 'message' => 'Teacher updated successfully.', 'data' => $updatedTeacher]);
         } catch (ValidationException $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
@@ -309,18 +251,13 @@ class TeacherController extends Controller
     {
         DB::beginTransaction();
         try {
-            $teacher = DB::table('teachers')->where('id', '=', $id)->first();
+            $teacher = DB::table('teachers')->where('id', $id)->first();
             if (!$teacher) {
                 return response()->json(['success' => false, 'message' => 'Teacher not found.'], 404);
             }
 
-            $user = DB::table('users')->where('id', '=', $teacher->user_id)->first();
-            if (!$user) {
-                return response()->json(['success' => false, 'message' => 'Associated user not found.'], 404);
-            }
-
-            DB::table('teachers')->where('id', '=', $id)->delete();
-            DB::table('users')->where('id', '=', $teacher->user_id)->delete();
+            DB::table('users')->where('id', $teacher->user_id)->delete();
+            DB::table('teachers')->where('id', $id)->delete();
 
             DB::commit();
 

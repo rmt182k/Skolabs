@@ -32,14 +32,15 @@ class StudentController extends Controller
                     'students.enrollment_date',
                     'students.grade_level',
                     'students.major_id',
-                    'majors.level as major_level',
                     'majors.name as major_name',
                     'majors.description as major_description',
+                    'educational_levels.name as educational_level_name',
                     'students.created_at',
                     'students.updated_at'
                 )
                 ->join('users', 'students.user_id', '=', 'users.id')
                 ->leftJoin('majors', 'students.major_id', '=', 'majors.id')
+                ->leftJoin('educational_levels', 'majors.educational_level_id', '=', 'educational_levels.id')
                 ->get();
 
             if ($students->isEmpty()) {
@@ -64,9 +65,9 @@ class StudentController extends Controller
                     'grade_level' => $student->grade_level,
                     'major' => [
                         'id' => $student->major_id,
-                        'level' => $student->major_level,
                         'name' => $student->major_name,
                         'description' => $student->major_description,
+                        'educational_level_name' => $student->educational_level_name,
                     ],
                     'created_at' => $student->created_at,
                     'updated_at' => $student->updated_at
@@ -103,10 +104,16 @@ class StudentController extends Controller
                     'students.address',
                     'students.enrollment_date',
                     'students.grade_level',
+                    'students.major_id',
+                    'majors.name as major_name',
+                    'majors.description as major_description',
+                    'educational_levels.name as educational_level_name',
                     'students.created_at',
                     'students.updated_at'
                 )
                 ->join('users', 'students.user_id', '=', 'users.id')
+                ->leftJoin('majors', 'students.major_id', '=', 'majors.id')
+                ->leftJoin('educational_levels', 'majors.educational_level_id', '=', 'educational_levels.id')
                 ->where('students.id', '=', $id)
                 ->first();
 
@@ -128,6 +135,12 @@ class StudentController extends Controller
                 'address' => $student->address,
                 'enrollment_date' => $student->enrollment_date,
                 'grade_level' => $student->grade_level,
+                'major' => [
+                    'id' => $student->major_id,
+                    'name' => $student->major_name,
+                    'description' => $student->major_description,
+                    'educational_level_name' => $student->educational_level_name,
+                ],
                 'created_at' => $student->created_at,
                 'updated_at' => $student->updated_at
             ];
@@ -161,7 +174,7 @@ class StudentController extends Controller
                 'address' => 'nullable|string',
                 'enrollment_date' => 'nullable|date',
                 'grade_level' => 'nullable|integer',
-                'major_id' => 'nullable|integer'
+                'major_id' => 'nullable|exists:majors,id'
             ]);
 
             DB::beginTransaction();
@@ -276,7 +289,7 @@ class StudentController extends Controller
                 'address' => 'nullable|string',
                 'enrollment_date' => 'nullable|date',
                 'grade_level' => 'nullable|integer',
-                'major_id' => 'nullable|integer'
+                'major_id' => 'nullable|exists:majors,id'
             ]);
 
             DB::beginTransaction();
@@ -339,10 +352,15 @@ class StudentController extends Controller
                     'students.enrollment_date',
                     'students.grade_level',
                     'students.major_id',
+                    'majors.name as major_name',
+                    'majors.description as major_description',
+                    'educational_levels.name as educational_level_name',
                     'students.created_at',
                     'students.updated_at'
                 )
                 ->join('users', 'students.user_id', '=', 'users.id')
+                ->leftJoin('majors', 'students.major_id', '=', 'majors.id')
+                ->leftJoin('educational_levels', 'majors.educational_level_id', '=', 'educational_levels.id')
                 ->where('students.id', '=', $id)
                 ->first();
 
@@ -357,7 +375,12 @@ class StudentController extends Controller
                 'address' => $updatedStudent->address,
                 'enrollment_date' => $updatedStudent->enrollment_date,
                 'grade_level' => $updatedStudent->grade_level,
-                'major_id' => $updatedStudent->major_id,
+                'major' => [
+                    'id' => $updatedStudent->major_id,
+                    'name' => $updatedStudent->major_name,
+                    'description' => $updatedStudent->major_description,
+                    'educational_level_name' => $updatedStudent->educational_level_name,
+                ],
                 'created_at' => $updatedStudent->created_at,
                 'updated_at' => $updatedStudent->updated_at
             ];

@@ -7,25 +7,20 @@
             </div>
             <div class="modal-body">
                 <form id="majorForm">
-                    <input type="hidden" id="majorId">
+                    <input type="hidden" id="majorId" name="id">
                     <div class="mb-3">
-                        <label for="level" class="form-label">Education Level</label>
-                        <select class="form-select" id="level" name="level" required>
-                            <option value="">Select Level</option>
-                            <option value="elementary_school">Elementary School (SD)</option>
-                            <option value="junior_high">Junior High School (SMP)</option>
-                            <option value="senior_high_general">Senior High General (SMA)</option>
-                            <option value="senior_high_vocational">Senior High Vocational (SMK)</option>
+                        <label for="educationalLevelId" class="form-label">Educational Level</label>
+                        <select class="form-select" id="educationalLevelId" name="educational_level_id" required>
+                            <option value="">Select Educational Level</option>
                         </select>
-
                     </div>
                     <div class="mb-3">
-                        <label for="value" class="form-label">Name</label>
+                        <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="text" class="form-label">Description</label>
-                        <input type="text" class="form-control" id="text" name="description" required>
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description" name="description" required>
                     </div>
                 </form>
             </div>
