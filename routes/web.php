@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EducationalLevelController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
@@ -23,6 +24,10 @@ Route::group(['auth', 'verified'], function () {
         return view('teacher.index');
     });
 
+    Route::get('/educational-level', function(){
+        return view('educational-level.index');
+    });
+
     Route::get('/major', function () {
         return view('major.index');
     });
@@ -33,11 +38,16 @@ Route::group(['auth', 'verified'], function () {
     Route::put('/api/students/{id}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/api/students/{id}', [StudentController::class, 'delete'])->name('students.delete');
 
-    // Route::get('/major')
+    Route::get('/api/teachers', [TeacherController::class, 'index'])->name('teachers.index');
+    Route::get('/api/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
+    Route::post('/api/teachers', [TeacherController::class, 'store'])->name('teachers.store');
+    Route::put('/api/teachers/{id}', [TeacherController::class, 'update'])->name('teachers.update');
+
+    Route::get('/api/educational-levels', [EducationalLevelController::class, 'index'])->name('educational-levels.index');
+    Route::get('/api/educational-levels/{id}', [EducationalLevelController::class, 'show'])->name('educational-levels.show');
+    Route::post('api/educational-levels', [EducationalLevelController::class, 'store'])->name('educational-levels.store');
+
     Route::get('/api/majors', [MajorController::class, 'index'])->name('majors.index');
     Route::get('/api/majors/{id}', [MajorController::class, 'show'])->name('majors.show');
     Route::post('api/majors', [MajorController::class, 'store'])->name('majors.store');
-
-    Route::get('/api/teachers', [TeacherController::class, 'index'])->name('teachers.index');
-    Route::get('/api/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
 });

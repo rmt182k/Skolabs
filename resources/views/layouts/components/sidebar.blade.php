@@ -97,17 +97,31 @@
                     </li>
 
                     <li class="side-nav-item">
-                        <a data-bs-toggle="collapse" href="#sidebarClasses" aria-expanded="false"
-                            aria-controls="sidebarClasses" class="side-nav-link">
+                        <a data-bs-toggle="collapse" href="#sidebarClassesAndSubjects" aria-expanded="false"
+                            aria-controls="sidebarClassesAndSubjects" class="side-nav-link">
                             <i class="uil-books"></i>
                             <span> Classes & Subjects </span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <div class="collapse" id="sidebarClasses">
+                        <div class="collapse" id="sidebarClassesAndSubjects">
                             <ul class="side-nav-second-level">
+                                <li><a href="/classes">Classes</a></li>
+                                <li><a href="/subjects">Subjects</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a data-bs-toggle="collapse" href="#sidebarEducational" aria-expanded="false"
+                            aria-controls="sidebarEducational" class="side-nav-link">
+                            <i class="uil-graduation-cap"></i>
+                            <span> Educational </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarEducational">
+                            <ul class="side-nav-second-level">
+                                <li><a href="/educational-level">Educational Levels</a></li>
                                 <li><a href="/major">Majors</a></li>
-                                <li><a href="#">Class Management</a></li>
-                                <li><a href="#">Subjects</a></li>
                             </ul>
                         </div>
                     </li>

@@ -217,27 +217,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Menangani perubahan dropdown Education Level
     $('#studentMajorLevel').on('change', function (e) {
         const selectedLevel = $(this).val();
 
-        // Aktifkan atau nonaktifkan field Major berdasarkan pilihan
         const isHighSchool = selectedLevel === 'senior_high_general' || selectedLevel === 'senior_high_vocational';
         $('#studentMajorField').prop('disabled', !isHighSchool);
 
-        // Pastikan field major selalu terlihat
         $('#studentMajorFieldGroup').removeClass('d-none');
 
-        // Jika SMA atau SMK, muat data jurusan
         if (isHighSchool) {
             fetchMajors(selectedLevel);
         } else {
-            // Jika tidak, kosongkan dan reset ke "Select Major"
             $('#studentMajorField').empty().append('<option value="">Select Major</option>');
         }
     });
 
-    // Fungsi untuk mengambil data jurusan
     function fetchMajors(level, majorId = null) {
         $.ajax({
             url: `/api/majors?level=${level}`,

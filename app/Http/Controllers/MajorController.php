@@ -3,23 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Major;
+use App\Models\EducationalLevel;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class MajorController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         try {
-            $level = $request->query('level');
-            $query = DB::table('majors')
-                ->select('id', 'level', 'name', 'description', 'created_at', 'updated_at');
+            $educationalLevelId = $request->query('educational_level_id');
+            $query = Major::with('educationalLevel');
 
-            if ($level) {
-                $query->where('level', '=', $level);
+            if ($educationalLevelId) {
+                $query->where('educational_level_id', $educationalLevelId);
             }
 
             $majors = $query->get();
@@ -32,39 +37,31 @@ class MajorController extends Controller
                 ], 200);
             }
 
-            $formattedData = $majors->map(function ($major) {
-                return [
-                    'id' => $major->id,
-                    'level' => $major->level,
-                    'name' => $major->name,
-                    'description' => $major->description,
-                    'created_at' => $major->created_at,
-                    'updated_at' => $major->updated_at
-                ];
-            })->toArray();
-
             return response()->json([
                 'success' => true,
                 'message' => 'Majors retrieved successfully.',
-                'data' => $formattedData
+                'data' => $majors
             ], 200);
 
         } catch (Exception $e) {
             Log::error('Error fetching majors: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Failed to retrieve majors. Please try again later.'
             ], 500);
         }
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         try {
-            $major = DB::table('majors')
-                ->select('id', 'level', 'name', 'description', 'created_at', 'updated_at')
-                ->where('id', '=', $id)
-                ->first();
+            $major = Major::with('educationalLevel')->find($id);
 
             if (!$major) {
                 return response()->json([
@@ -73,19 +70,10 @@ class MajorController extends Controller
                 ], 404);
             }
 
-            $formattedData = [
-                'id' => $major->id,
-                'level' => $major->level,
-                'name' => $major->name,
-                'description' => $major->description,
-                'created_at' => $major->created_at,
-                'updated_at' => $major->updated_at
-            ];
-
             return response()->json([
                 'success' => true,
                 'message' => 'Major retrieved successfully.',
-                'data' => $formattedData
+                'data' => $major
             ], 200);
 
         } catch (Exception $e) {
@@ -97,61 +85,56 @@ class MajorController extends Controller
         }
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         try {
             $validatedData = $request->validate([
-                'level' => 'required|in:senior_high_general,senior_high_vocational',
+                'educational_level_id' => 'required|exists:educational_levels,id',
                 'name' => 'required|string|max:255|unique:majors,name',
                 'description' => 'required|string|max:255'
             ]);
 
-            DB::beginTransaction();
-
-            $major = new Major();
-            $major->level = $validatedData['level'];
-            $major->name = $validatedData['name'];
-            $major->description = $validatedData['description'];
-            $major->save();
-
-            DB::commit();
-
-            $formattedData = [
-                'id' => $major->id,
-                'level' => $major->level,
-                'name' => $major->name,
-                'description' => $major->description,
-                'created_at' => $major->created_at,
-                'updated_at' => $major->updated_at
-            ];
+            $major = Major::create($validatedData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Major created successfully.',
-                'data' => $formattedData
+                'data' => $major->load('educationalLevel')
             ], 201);
 
         } catch (ValidationException $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
                 'errors' => $e->errors()
             ], 422);
         } catch (Exception $e) {
-            DB::rollBack();
             Log::error('Error creating major: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Failed to create major. Please try again later.'
             ], 500);
         }
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         try {
-            $major = DB::table('majors')->where('id', '=', $id)->first();
+            $major = Major::find($id);
+
             if (!$major) {
                 return response()->json([
                     'success' => false,
@@ -160,59 +143,26 @@ class MajorController extends Controller
             }
 
             $validatedData = $request->validate([
-                'level' => 'sometimes|required|in:senior_high_general,senior_high_vocational,university',
+                'educational_level_id' => 'sometimes|required|exists:educational_levels,id',
                 'name' => 'sometimes|required|string|max:255|unique:majors,name,' . $id,
                 'description' => 'sometimes|required|string|max:255'
             ]);
 
-            DB::beginTransaction();
-
-            $updateData = [];
-            if (isset($validatedData['level'])) {
-                $updateData['level'] = $validatedData['level'];
-            }
-            if (isset($validatedData['name'])) {
-                $updateData['name'] = $validatedData['name'];
-            }
-            if (isset($validatedData['description'])) {
-                $updateData['description'] = $validatedData['description'];
-            }
-            if (!empty($updateData)) {
-                DB::table('majors')->where('id', '=', $id)->update($updateData);
-            }
-
-            DB::commit();
-
-            // Ambil data terbaru untuk response
-            $updatedMajor = DB::table('majors')
-                ->select('id', 'level', 'name', 'description', 'created_at', 'updated_at')
-                ->where('id', '=', $id)
-                ->first();
-
-            $formattedData = [
-                'id' => $updatedMajor->id,
-                'level' => $updatedMajor->level,
-                'name' => $updatedMajor->name,
-                'description' => $updatedMajor->description,
-                'created_at' => $updatedMajor->created_at,
-                'updated_at' => $updatedMajor->updated_at
-            ];
+            $major->update($validatedData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Major updated successfully.',
-                'data' => $formattedData
+                'data' => $major->load('educationalLevel')
             ], 200);
 
         } catch (ValidationException $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
                 'errors' => $e->errors()
             ], 422);
         } catch (Exception $e) {
-            DB::rollBack();
             Log::error('Error updating major with ID ' . $id . ': ' . $e->getMessage());
             return response()->json([
                 'success' => false,
@@ -221,10 +171,17 @@ class MajorController extends Controller
         }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy($id)
     {
         try {
-            $major = DB::table('majors')->where('id', '=', $id)->first();
+            $major = Major::find($id);
+
             if (!$major) {
                 return response()->json([
                     'success' => false,
@@ -232,11 +189,7 @@ class MajorController extends Controller
                 ], 404);
             }
 
-            DB::beginTransaction();
-
-            DB::table('majors')->where('id', '=', $id)->delete();
-
-            DB::commit();
+            $major->delete();
 
             return response()->json([
                 'success' => true,
@@ -244,7 +197,6 @@ class MajorController extends Controller
             ], 200);
 
         } catch (Exception $e) {
-            DB::rollBack();
             Log::error('Error deleting major with ID ' . $id . ': ' . $e->getMessage());
             return response()->json([
                 'success' => false,

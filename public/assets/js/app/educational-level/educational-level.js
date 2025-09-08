@@ -1,42 +1,26 @@
 $(document).ready(function () {
-    function populateEducationalLevels() {
-        $.ajax({
-            url: '/api/educational-levels',
-            method: 'GET',
-            success: function (response) {
-                if (response.success && response.data.length > 0) {
-                    let dropdown = $('#educationalLevelId');
-                    dropdown.empty();
-                    dropdown.append($('<option>', {
-                        value: '',
-                        text: 'Select Educational Level'
-                    }));
-                    $.each(response.data, function (key, value) {
-                        dropdown.append($('<option>', {
-                            value: value.id,
-                            text: value.name
-                        }));
-                    });
-                }
-            },
-            error: function (xhr) {
-                console.error("Error fetching educational levels: ", xhr.responseText);
-            }
-        });
-    }
-
     // Inisialisasi DataTable
-    var table = $('#majorTable').DataTable({
+    var table = $('#educationalLevelsTable').DataTable({
         ajax: {
-            url: '/api/majors',
+            url: '/api/educational-levels',
             dataSrc: 'data'
         },
         columns: [
-            { data: null, render: function (data, type, row, meta) { return meta.row + 1; } },
-            { data: 'educational_level_name' },
             { data: 'name' },
+            { data: 'duration_years' },
             { data: 'description' },
-            { data: 'created_at', render: function (data) { return new Date(data).toLocaleDateString(); } },
+            {
+                data: 'created_at',
+                render: function (data) {
+                    return new Date(data).toLocaleDateString();
+                }
+            },
+            {
+                data: 'updated_at',
+                render: function (data) {
+                    return new Date(data).toLocaleDateString();
+                }
+            },
             {
                 data: null,
                 render: function (data, type, row) {
@@ -50,31 +34,30 @@ $(document).ready(function () {
     });
 
     // Reset form dan modal untuk tambah data
-    $('#majorAddBtn').click(function () {
-        $('#majorForm')[0].reset();
-        $('#majorId').val('');
-        $('#majorModalLabel').text('Add Major');
-        $('#majorModal').modal('show');
-        populateEducationalLevels();
+    $('#addEducationalLevelBtn').click(function () {
+        $('#educationalLevelForm')[0].reset();
+        $('#educationalLevelId').val('');
+        $('#educationalLevelModalLabel').text('Add Educational Level');
+        $('#educationalLevelModal').modal('show');
     });
 
     // Simpan atau update data
-    $('#saveMajorBtn').click(function () {
-        let id = $('#majorId').val();
-        let url = id ? `/api/majors/${id}` : '/api/majors';
+    $('#saveEducationalLevelBtn').click(function () {
+        let id = $('#educationalLevelId').val();
+        let url = id ? `/api/educational-levels/${id}` : '/api/educational-levels';
         let method = id ? 'PUT' : 'POST';
 
         $.ajax({
             url: url,
             method: method,
-            data: $('#majorForm').serialize(),
+            data: $('#educationalLevelForm').serialize(),
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
                 if (response.success) {
                     table.ajax.reload();
-                    $('#majorModal').modal('hide');
+                    $('#educationalLevelModal').modal('hide');
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -98,27 +81,25 @@ $(document).ready(function () {
     // Edit data
     $(document).on('click', '.edit-btn', function () {
         let id = $(this).data('id');
-        populateEducationalLevels();
-
         $.ajax({
-            url: `/api/majors/${id}`,
+            url: `/api/educational-levels/${id}`,
             method: 'GET',
             success: function (response) {
                 if (response.success) {
                     let data = response.data;
-                    $('#majorId').val(data.id);
-                    $('#educationalLevelId').val(data.educational_level_id); // Menggunakan ID yang benar
+                    $('#educationalLevelId').val(data.id);
                     $('#name').val(data.name);
+                    $('#duration_years').val(data.duration_years);
                     $('#description').val(data.description);
-                    $('#majorModalLabel').text('Edit Major');
-                    $('#majorModal').modal('show');
+                    $('#educationalLevelModalLabel').text('Edit Educational Level');
+                    $('#educationalLevelModal').modal('show');
                 }
             },
             error: function (xhr) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to fetch major data',
+                    text: 'Failed to fetch educational level data',
                     confirmButtonColor: '#d33'
                 });
             }
@@ -130,7 +111,7 @@ $(document).ready(function () {
         let id = $(this).data('id');
         Swal.fire({
             title: 'Are you sure?',
-            text: 'You are about to delete this major. This action cannot be undone!',
+            text: 'You are about to delete this educational level. This action cannot be undone!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -139,7 +120,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: `/api/majors/${id}`,
+                    url: `/api/educational-levels/${id}`,
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -159,7 +140,7 @@ $(document).ready(function () {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
-                            text: 'Failed to delete major',
+                            text: 'Failed to delete educational level',
                             confirmButtonColor: '#d33'
                         });
                     }

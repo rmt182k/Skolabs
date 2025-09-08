@@ -8,12 +8,12 @@
             </div>
             <div class="modal-body p-4">
                 <form id="teacherForm" class="row g-3">
-                    <input type="hidden" id="teacher_id" name="id">
-
-                    {{-- User ID Field --}}
+                    <input type="hidden" id="teacherId" name="teacher_id">
+                    <input type="hidden" id="userId" name="user_id">
+                    {{-- User Name Field --}}
                     <div class="col-md-6">
-                        <label for="teacherUserId" class="form-label">User ID</label>
-                        <input type="number" class="form-control" id="teacherUserId" name="user_id" required>
+                        <label for="teacherName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="teacherName" name="name" required>
                         <div class="invalid-feedback"></div>
                     </div>
 
@@ -21,6 +21,23 @@
                     <div class="col-md-6">
                         <label for="teacherEmployeeId" class="form-label">Employee ID</label>
                         <input type="text" class="form-control" id="teacherEmployeeId" name="employee_id" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    {{-- Email Field --}}
+                    <div class="col-md-6">
+                        <label for="teacherEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="teacherEmail" name="email" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    {{-- Password Field --}}
+                    <div class="col-md-6">
+                        <label for="teacherPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="teacherPassword" name="password">
+                        <div id="passwordHelpBlock" class="form-text">
+                            If left blank, the default password is "password".
+                        </div>
                         <div class="invalid-feedback"></div>
                     </div>
 

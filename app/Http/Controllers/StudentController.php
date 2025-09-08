@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -152,7 +153,7 @@ class StudentController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email',
-                'password' => 'required|string|min:8',
+                'password' => 'nullable|string|min:8',
                 'nisn' => 'required|string|max:20|unique:students,nisn',
                 'date_of_birth' => 'nullable|date',
                 'gender' => 'nullable|in:male,female,Other',
@@ -165,10 +166,12 @@ class StudentController extends Controller
 
             DB::beginTransaction();
 
+            $password = $validatedData['password'] ?? 'password';
+
             $user = new User();
             $user->name = $validatedData['name'];
             $user->email = $validatedData['email'];
-            $user->password = Hash::make($validatedData['password']);
+            $user->password = Hash::make($password);
             $user->save();
 
             $role = Role::where('name', 'student')->first();
@@ -192,7 +195,7 @@ class StudentController extends Controller
 
             $student = new Student();
             $student->user_id = $user->id;
-            $student->nisn = $validatedData['nisn']; // Simpan nisn
+            $student->nisn = $validatedData['nisn'];
             $student->date_of_birth = $validatedData['date_of_birth'] ?? null;
             $student->gender = $validatedData['gender'] ?? null;
             $student->phone_number = $validatedData['phone_number'] ?? null;
@@ -264,9 +267,9 @@ class StudentController extends Controller
 
             $validatedData = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
-                'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
-                'password' => 'sometimes|required|string|min:8',
-                'nisn' => 'sometimes|required|string|max:20|unique:students,nisn,' . $student->id, // Validasi untuk nisn
+                'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+                'password' => 'nullable|string|min:8|confirmed',
+                'nisn' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('students')->ignore($student->id)],
                 'date_of_birth' => 'nullable|date',
                 'gender' => 'nullable|in:male,female,Other',
                 'phone_number' => 'nullable|string|max:15',
@@ -294,7 +297,7 @@ class StudentController extends Controller
 
             $studentUpdateData = [];
             if (isset($validatedData['nisn'])) {
-                $studentUpdateData['nisn'] = $validatedData['nisn']; // Update nisn
+                $studentUpdateData['nisn'] = $validatedData['nisn'];
             }
             if (isset($validatedData['date_of_birth'])) {
                 $studentUpdateData['date_of_birth'] = $validatedData['date_of_birth'];

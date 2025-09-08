@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('majors', function (Blueprint $table) {
             $table->id();
-            $table->string('level')->index();
+            $table->unsignedBigInteger('educational_level_id');
             $table->string('name')->unique();
             $table->string('description');
             $table->timestamps();

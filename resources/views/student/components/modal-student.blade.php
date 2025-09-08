@@ -28,7 +28,7 @@
 
                     <div class="col-md-6">
                         <label for="studentPassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="studentPassword" name="password" required>
+                        <input type="password" class="form-control" id="studentPassword" name="password">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-md-6">

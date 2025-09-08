@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         columns: [
             { data: 'id', name: 'id' },
-            { data: 'user.name', name: 'user.name', defaultContent: '-' },
+            { data: 'name', name: 'name', defaultContent: '-' },
             { data: 'employee_id', name: 'employee_id', defaultContent: '-' },
             { data: 'date_of_birth', name: 'date_of_birth', defaultContent: '-' },
             { data: 'phone_number', name: 'phone_number', defaultContent: '-' },
@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <button class="btn btn-sm btn-warning edit-btn"
                             data-id="${row.id}"
                             data-user-id="${row.user_id}"
+                            data-name="${row.name}"
+                            data-email="${row.email}"
                             data-employee-id="${row.employee_id}"
                             data-date-of-birth="${row.date_of_birth}"
                             data-phone-number="${row.phone_number}"
@@ -72,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle "Add Teacher" button click
     $('#teacherAddBtn').on('click', function () {
         $('#teacherModalLabel').text('👤 Add New Teacher');
-        $('#teacher_id').val(''); // Clear hidden ID
+        $('#teacherId').val(''); // Clear hidden ID
         $('#teacherForm')[0].reset(); // Reset the form
         $('#teacherModal').modal('show');
     });
@@ -81,14 +83,16 @@ document.addEventListener('DOMContentLoaded', function () {
     $(document).on('click', '.edit-btn', function () {
         const data = $(this).data();
         $('#teacherModalLabel').text('✏️ Edit Teacher');
-        $('#teacher_id').val(data.id);
-        $('#user_id').val(data.userId);
-        $('#employee_id').val(data.employeeId);
-        $('#date_of_birth').val(data.dateOfBirth);
-        $('#phone_number').val(data.phoneNumber);
-        $('#address').val(data.address);
-        $('#gender').val(data.gender);
-        $('#status').val(data.status);
+        $('#teacherId').val(data.id);
+        $('#userId').val(data.userId);
+        $('#teacherName').val(data.name);
+        $('#teacherEmail').val(data.email);
+        $('#teacherEmployeeId').val(data.employeeId);
+        $('#teacherDateOfBirth').val(data.dateOfBirth);
+        $('#teacherPhoneNumber').val(data.phoneNumber);
+        $('#teacherAddress').val(data.address);
+        $('#teacherGender').val(data.gender).trigger('change');
+        $('#teacherStatus').val(data.status).trigger('change');
 
         $('#teacherModal').modal('show');
     });
@@ -155,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#teacherForm').on('submit', function (e) {
         e.preventDefault();
 
-        const teacherId = $('#teacher_id').val();
+        const teacherId = $('#teacherId').val();
         const method = teacherId ? 'PUT' : 'POST';
         const url = teacherId ? `${API_URL}/${teacherId}` : API_URL;
 
