@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // API endpoint
     const API_URL = '/api/admins';
 
-    // Initialize DataTable
     const adminTable = $('#admins-datatable').DataTable({
         processing: true,
         ajax: {

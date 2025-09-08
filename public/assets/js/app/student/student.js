@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const studentTable = $('#studentTable').DataTable({
-        // ...getTableConfig('#studentTable'), // Pastikan fungsi ini ada jika Anda menggunakannya
+        // ...getTableConfig('#studentTable'),
         processing: true,
         ajax: {
             url: API_URL,

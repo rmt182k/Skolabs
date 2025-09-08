@@ -92,6 +92,7 @@
                                 <li><a href="/student">Students</a></li>
                                 <li><a href="/teacher">Teachers</a></li>
                                 <li><a href="/admin">Admins</a></li>
+                                <li><a href="/staff">Staffs</a></li>
                             </ul>
                         </div>
                     </li>

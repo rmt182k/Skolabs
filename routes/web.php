@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EducationalLevelController;
 use App\Http\Controllers\MajorController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,14 @@ Route::group(['auth', 'verified'], function () {
         return view('teacher.index');
     });
 
+    Route::get('/admin', function(){
+        return view('admin.index');
+    });
+
+    Route::get('/staff', function(){
+        return view('staff.index');
+    });
+
     Route::get('/educational-level', function(){
         return view('educational-level.index');
     });
@@ -33,9 +42,7 @@ Route::group(['auth', 'verified'], function () {
         return view('major.index');
     });
 
-    Route::get('/admin', function(){
-        return view('admin.index');
-    });
+
 
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/api/students/{id}', [StudentController::class, 'show'])->name('students.show');
@@ -52,6 +59,11 @@ Route::group(['auth', 'verified'], function () {
     Route::get('/api/admins/{id}', [AdminController::class, 'show'])->name('admins.show');
     Route::post('/api/admins', [AdminController::class, 'store'])->name('admins.store');
     Route::put('/api/admins/{id}', [AdminController::class, 'update'])->name('admins.update');
+
+    Route::get('/api/staffs', [StaffController::class, 'index'])->name('staffs.index');
+    Route::get('/api/staffs/{id}', [StaffController::class, 'show'])->name('staffs.show');
+    Route::post('/api/staffs', [StaffController::class, 'store'])->name('staffs.store');
+    Route::put('/api/staffs/{id}', [StaffController::class, 'update'])->name('staffs.update');
 
     Route::get('/api/educational-levels', [EducationalLevelController::class, 'index'])->name('educational-levels.index');
     Route::get('/api/educational-levels/{id}', [EducationalLevelController::class, 'show'])->name('educational-levels.show');

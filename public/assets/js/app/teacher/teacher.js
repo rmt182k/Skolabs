@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const teacherTable = $('#teachers-datatable').DataTable({
         // ... (other DataTable configurations)
-        // ...getTableConfig('#teachers-datatable'), // Pastikan fungsi ini ada jika Anda menggunakannya
+        // ...getTableConfig('#teachers-datatable'),
         processing: true,
-        // serverSide: true, // Hapus atau sesuaikan ini jika data Anda tidak besar
+        // serverSide: true,
         ajax: {
             url: API_URL,
             dataSrc: function (json) {

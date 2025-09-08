@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    // Inisialisasi DataTable
     var table = $('#educationalLevelsTable').DataTable({
         ajax: {
             url: '/api/educational-levels',
