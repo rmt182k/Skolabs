@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EducationalLevelController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\StudentController;
@@ -32,6 +33,10 @@ Route::group(['auth', 'verified'], function () {
         return view('major.index');
     });
 
+    Route::get('/admin', function(){
+        return view('admin.index');
+    });
+
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/api/students/{id}', [StudentController::class, 'show'])->name('students.show');
     Route::post('/api/students', [StudentController::class, 'store'])->name('students.store');
@@ -42,6 +47,11 @@ Route::group(['auth', 'verified'], function () {
     Route::get('/api/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
     Route::post('/api/teachers', [TeacherController::class, 'store'])->name('teachers.store');
     Route::put('/api/teachers/{id}', [TeacherController::class, 'update'])->name('teachers.update');
+
+    Route::get('/api/admins', [AdminController::class, 'index'])->name('admins.index');
+    Route::get('/api/admins/{id}', [AdminController::class, 'show'])->name('admins.show');
+    Route::post('/api/admins', [AdminController::class, 'store'])->name('admins.store');
+    Route::put('/api/admins/{id}', [AdminController::class, 'update'])->name('admins.update');
 
     Route::get('/api/educational-levels', [EducationalLevelController::class, 'index'])->name('educational-levels.index');
     Route::get('/api/educational-levels/{id}', [EducationalLevelController::class, 'show'])->name('educational-levels.show');
