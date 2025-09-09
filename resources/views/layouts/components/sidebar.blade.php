@@ -98,18 +98,29 @@
                     </li>
 
                     <li class="side-nav-item">
-                        <a data-bs-toggle="collapse" href="#sidebarClassesAndSubjects" aria-expanded="false"
-                            aria-controls="sidebarClassesAndSubjects" class="side-nav-link">
-                            <i class="uil-books"></i>
-                            <span> Classes & Subjects </span>
+                        <a data-bs-toggle="collapse" href="#sidebarClasses" aria-expanded="false"
+                            aria-controls="sidebarClasses" class="side-nav-link">
+                            <i class="uil-presentation"></i>
+                            <span> Classes </span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <div class="collapse" id="sidebarClassesAndSubjects">
+                        <div class="collapse" id="sidebarClasses">
                             <ul class="side-nav-second-level">
-                                <li><a href="/classes">Classes</a></li>
-                                <li><a href="/subjects">Subjects</a></li>
+                                <li>
+                                    <a href="/class">Manage Classes</a>
+                                </li>
+                                <li>
+                                    <a href="/class-student">Assign Students</a>
+                                </li>
                             </ul>
                         </div>
+                    </li>
+
+                    <li class="side-nav-item">
+                        <a href="/subject" class="side-nav-link">
+                            <i class="uil-books"></i>
+                            <span> Subjects </span>
+                        </a>
                     </li>
 
                     <li class="side-nav-item">
@@ -128,18 +139,27 @@
                     </li>
 
                     <li class="side-nav-item">
-                        <a href="#" class="side-nav-link">
+                        <a href="/learning-material" class="side-nav-link">
                             <i class="uil-file-info-alt"></i>
                             <span> Learning Materials </span>
                         </a>
                     </li>
 
                     <li class="side-nav-item">
-                        <a href="#" class="side-nav-link">
+                        <a data-bs-toggle="collapse" href="#sidebarAssignments" aria-expanded="false"
+                            aria-controls="sidebarAssignments" class="side-nav-link">
                             <i class="uil-edit-alt"></i>
-                            <span> Assignments </span>
+                            <span> Assignments & Submission</span>
+                            <span class="menu-arrow"></span>
                         </a>
+                        <div class="collapse" id="sidebarAssignments">
+                            <ul class="side-nav-second-level">
+                                <li><a href="/assignment"> Assignment</a></li>
+                                <li><a href="/assignment-submission"> Submissions</a></li>
+                            </ul>
+                        </div>
                     </li>
+
 
                     <li class="side-nav-item">
                         <a href="#" class="side-nav-link">
