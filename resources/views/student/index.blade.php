@@ -1,39 +1,52 @@
 @extends('layouts.auth')
 
-@section('title', 'Skolabs Student')
+@section('title', 'Student Management')
+
+@push('styles')
+    {{-- Flatpickr CSS untuk date-time picker --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+@endpush
 
 @section('content')
     <div class="container-fluid">
-        @include('layouts.components.breadcrumb')
+        {{-- Breadcrumb bisa Anda sesuaikan --}}
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-sm-0">Students</h4>
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Student Management</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-12">
                 <div class="card">
+                     <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Student List</h5>
+                        <button id="studentAddBtn" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Add New Student
+                        </button>
+                    </div>
                     <div class="card-body">
-                        <h4 class="header-title">Students Table</h4>
-                        <p class="text-muted font-14 mb-4">
-                            {{-- put notes here --}}
-                        </p>
-
-                        {{-- Table Students --}}
                         <div class="table-responsive">
-                            <div class="d-flex justify-content-end mb-3">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="studentAddBtn">Add</button>
-                            </div>
                             @include('student.components.table-student')
                         </div>
-
-                    </div> <!-- end card body-->
-                </div> <!-- end card -->
-            </div><!-- end col-->
-        </div> <!-- end row-->
-
-        @include('student.components.modal-student')
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    @include('student.components.modal-student')
 @endsection
-@push('styles')
-@endpush
+
 @push('scripts')
+    {{-- Flatpickr JS untuk date-time picker --}}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('assets/js/app/student/student.js') }}"></script>
-    <script src="{{ asset('assets/js/app/utils/tableConfig.js') }}"></script>
 @endpush

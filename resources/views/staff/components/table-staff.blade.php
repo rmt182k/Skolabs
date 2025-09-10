@@ -1,14 +1,16 @@
-<table id="staff-datatable" class="table table-bordered dt-responsive nowrap" style="width:100%">
+{{-- File: resources/views/staff/components/table-staff.blade.php --}}
+
+<table id="staff-datatable" class="table table-striped table-bordered w-100 mb-0">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>#</th>
             <th>Name</th>
-            <th>Email</th>
             <th>Position</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
+        {{-- Data akan diisi oleh DataTables secara dinamis --}}
     </tbody>
 </table>

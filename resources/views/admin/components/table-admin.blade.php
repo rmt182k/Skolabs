@@ -1,7 +1,7 @@
-<table id="admins-datatable" class="table table-bordered dt-responsive nowrap" style="width:100%">
+<table id="admins-datatable" class="table table-striped table-bordered w-100 mb-0">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>#</th>
             <th>Name</th>
             <th>Email</th>
             <th>Job Title</th>

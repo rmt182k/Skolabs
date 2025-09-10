@@ -70,6 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/api/students/{id}', [StudentController::class, 'show'])->name('students.show');
+    Route::get('/api/students/create-data', [StudentController::class, 'getCreateData'])->name('students.create-data');
     Route::post('/api/students', [StudentController::class, 'store'])->name('students.store');
     Route::put('/api/students/{id}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/api/students/{id}', [StudentController::class, 'delete'])->name('students.delete');

@@ -1,182 +1,148 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // API endpoint
-    const API_URL = '/api/teachers';
+// File: public/assets/js/app/teacher/teacher.js
 
-    // Initialize DataTable
-    if ($.fn.DataTable.isDataTable('#teachers-datatable')) {
-        $('#teachers-datatable').DataTable().destroy();
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    // --- KONFIGURASI & VARIABEL GLOBAL ---
+    const API_URL = '/api/teachers';
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+    const teacherModal = new bootstrap.Modal(document.getElementById('teacherModal'));
+
+    // --- INISIALISASI ---
+    const dateOfBirthPicker = flatpickr("#teacherDateOfBirth", {
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        maxDate: "today"
+    });
 
     const teacherTable = $('#teachers-datatable').DataTable({
-        // ... (other DataTable configurations)
-        // ...getTableConfig('#teachers-datatable'),
         processing: true,
-        // serverSide: true,
         ajax: {
             url: API_URL,
-            dataSrc: function (json) {
-                if (!json.success) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: json.message || 'Failed to load teacher data.'
-                    });
-                    return [];
-                }
-                return json.data || [];
-            },
-            error: function (xhr, error, thrown) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to fetch teacher data: ' + (xhr.statusText || thrown),
-                });
-                console.error('DataTable AJAX error:', xhr, error, thrown);
-            }
+            dataSrc: 'data',
+            error: (xhr) => handleAjaxError('Failed to fetch teacher data.', xhr)
         },
         columns: [
-            { data: 'id', name: 'id' },
-            { data: 'name', name: 'name', defaultContent: '-' },
-            { data: 'employee_id', name: 'employee_id', defaultContent: '-' },
-            { data: 'date_of_birth', name: 'date_of_birth', defaultContent: '-' },
-            { data: 'phone_number', name: 'phone_number', defaultContent: '-' },
-            { data: 'gender', name: 'gender', defaultContent: '-' },
-            { data: 'status', name: 'status', defaultContent: '-' },
+            { data: null, searchable: false, orderable: false, render: (data, type, row, meta) => meta.row + 1 },
+            { data: 'name', defaultContent: '-' },
+            { data: 'employee_id', defaultContent: '-' },
+            { data: 'phone_number', defaultContent: '-' },
             {
-                data: null,
-                orderable: false,
-                render: function (data, type, row) {
-                    // Tombol edit sekarang hanya butuh data-id
-                    return `
-                        <button class="btn btn-sm btn-warning edit-btn"
-                            data-id="${row.id}">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-sm btn-danger delete-btn"
-                            data-id="${row.id}"
-                            data-name="${row.name}">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    `;
-                }
+                data: 'status',
+                render: (data) => data === 'active'
+                    ? '<span class="badge bg-success-subtle text-success">Active</span>'
+                    : '<span class="badge bg-danger-subtle text-danger">Inactive</span>'
+            },
+            {
+                data: null, orderable: false, searchable: false,
+                render: (data) => `
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-warning edit-btn" data-id="${data.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${data.id}" data-name="${data.name}"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                `
             }
         ]
     });
 
-    // Handle "Add Teacher" button click
-    $('#teacherAddBtn').on('click', function () {
+    // --- FUNGSI BANTUAN ---
+    const showNotification = (icon, title, text = '') => Swal.fire({ icon, title, text, timer: 2000, showConfirmButton: false });
+    const handleAjaxError = (defaultMessage, xhr = null) => {
+        const message = xhr?.responseJSON?.message || defaultMessage;
+        showNotification('error', 'An Error Occurred', message);
+        console.error('AJAX Error:', xhr);
+    };
+    const clearValidationErrors = () => {
+        $('.form-control, .form-select').removeClass('is-invalid');
+        $('.invalid-feedback').text('');
+    };
+    const displayValidationErrors = (errors) => {
+        clearValidationErrors();
+        for (const field in errors) {
+            const input = $(`[name="${field}"]`);
+            input.addClass('is-invalid').next('.invalid-feedback').text(errors[field][0]);
+        }
+    };
+    const resetForm = () => {
+        $('#teacherForm')[0].reset();
+        $('#teacherId').val('');
+        clearValidationErrors();
+        dateOfBirthPicker.clear();
+    };
+
+    // --- EVENT LISTENERS ---
+    $('#teacherAddBtn').on('click', () => {
+        resetForm();
         $('#teacherModalLabel').text('👤 Add New Teacher');
-        $('#teacherId').val(''); // Clear hidden ID
-        $('#teacherForm')[0].reset(); // Reset the form
-        $('#teacherModal').modal('show');
+        teacherModal.show();
     });
 
-    // Handle "Edit" button click - **BAGIAN INI YANG DIPERBARUI**
-    $(document).on('click', '.edit-btn', function () {
+    $('#teachers-datatable').on('click', '.edit-btn', function () {
         const teacherId = $(this).data('id');
-
-        // Lakukan AJAX call untuk mendapatkan data guru terbaru
-        $.ajax({
-            url: `${API_URL}/${teacherId}`,
-            method: 'GET',
-            success: function (response) {
+        $.getJSON(`${API_URL}/${teacherId}`)
+            .done(response => {
                 if (response.success) {
+                    resetForm();
                     const data = response.data;
-
-                    // Isi form modal dengan data dari response AJAX
                     $('#teacherModalLabel').text('✏️ Edit Teacher');
                     $('#teacherId').val(data.id);
-                    $('#userId').val(data.user_id);
                     $('#teacherName').val(data.name);
-                    $('#teacherEmail').val(data.email); // Pastikan response API menyertakan email
+                    $('#teacherEmail').val(data.email);
                     $('#teacherEmployeeId').val(data.employee_id);
-                    $('#teacherDateOfBirth').val(data.date_of_birth);
+                    dateOfBirthPicker.setDate(data.date_of_birth, true); // Set tanggal via Flatpickr
                     $('#teacherPhoneNumber').val(data.phone_number);
                     $('#teacherAddress').val(data.address);
                     $('#teacherGender').val(data.gender);
                     $('#teacherStatus').val(data.status);
-
-                    // Tampilkan modal setelah form terisi
-                    $('#teacherModal').modal('show');
+                    teacherModal.show();
                 } else {
-                    Swal.fire('Error!', response.message || 'Teacher data not found.', 'error');
+                    showNotification('error', 'Error!', response.message);
                 }
-            },
-            error: function () {
-                Swal.fire('Error!', 'Failed to fetch teacher data.', 'error');
-            }
-        });
+            })
+            .fail(xhr => handleAjaxError('Failed to fetch teacher data.', xhr));
     });
 
-    // Handle "Delete" button click
-    $(document).on('click', '.delete-btn', function () {
+    $('#teachers-datatable').on('click', '.delete-btn', function () {
         const teacherId = $(this).data('id');
         const teacherName = $(this).data('name');
-
         Swal.fire({
-            title: 'Are you sure?',
-            text: `You are about to delete ${teacherName}. This action cannot be undone!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
+            title: 'Are you sure?', text: `You are about to delete ${teacherName}.`, icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: `${API_URL}/${teacherId}`,
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire('Deleted!', 'The teacher has been deleted.', 'success');
-                            teacherTable.ajax.reload(null, false);
-                        } else {
-                            Swal.fire('Failed!', response.message || 'Failed to delete teacher.', 'error');
-                        }
+                    url: `${API_URL}/${teacherId}`, method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken },
+                    success: (response) => {
+                        showNotification('success', 'Deleted!', response.message);
+                        teacherTable.ajax.reload(null, false);
                     },
-                    error: function () {
-                        Swal.fire('Error!', 'An error occurred while deleting the teacher.', 'error');
-                    }
+                    error: (xhr) => handleAjaxError('Failed to delete teacher.', xhr)
                 });
             }
         });
     });
 
-    // Handle Form Submit
     $('#teacherForm').on('submit', function (e) {
         e.preventDefault();
-
+        clearValidationErrors();
         const teacherId = $('#teacherId').val();
-        const method = teacherId ? 'PUT' : 'POST';
-        const url = teacherId ? `${API_URL}/${teacherId}` : API_URL;
+        let url = teacherId ? `${API_URL}/${teacherId}` : API_URL;
+        let formData = new FormData(this);
+        if (teacherId) formData.append('_method', 'PUT');
+
+        $('#saveTeacherBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
 
         $.ajax({
-            url: url,
-            method: method,
-            data: $(this).serialize(),
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            url: url, method: 'POST', data: formData, processData: false, contentType: false, headers: { 'X-CSRF-TOKEN': csrfToken },
+            success: (response) => {
+                showNotification('success', 'Success!', response.message);
+                teacherModal.hide();
+                teacherTable.ajax.reload();
             },
-            success: function (response) {
-                if (response.success) {
-                    Swal.fire('Success!', response.message, 'success');
-                    $('#teacherModal').modal('hide');
-                    teacherTable.ajax.reload();
-                } else {
-                    Swal.fire('Error!', response.message, 'error');
-                }
+            error: (xhr) => {
+                if (xhr.status === 422) displayValidationErrors(xhr.responseJSON.errors);
+                else handleAjaxError('Failed to save teacher data.', xhr);
             },
-            error: function (xhr) {
-                const errors = xhr.responseJSON?.errors;
-                if (errors) {
-                    let errorMsg = 'Please fix the following errors:\n';
-                    Object.values(errors).forEach(err => errorMsg += `- ${err[0]}\n`);
-                    Swal.fire('Validation Error!', errorMsg, 'error');
-                } else {
-                    Swal.fire('Error!', 'Failed to save teacher data.', 'error');
-                }
-            }
+            complete: () => $('#saveTeacherBtn').prop('disabled', false).text('Save Teacher')
         });
     });
 });

@@ -1,17 +1,17 @@
-<table id="teachers-datatable" class="table table-striped dt-responsive nowrap w-100">
+{{-- File: resources/views/teacher/components/table-teacher.blade.php --}}
+
+<table id="teachers-datatable" class="table table-striped table-bordered w-100 mb-0">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>#</th>
             <th>Name</th>
             <th>Employee ID</th>
-            <th>Date of Birth</th>
             <th>Phone Number</th>
-            <th>Gender</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        {{-- Data will be loaded here by DataTables --}}
+        {{-- Data akan diisi oleh DataTables secara dinamis --}}
     </tbody>
 </table>
