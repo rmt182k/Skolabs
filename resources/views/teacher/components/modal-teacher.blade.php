@@ -29,9 +29,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="teacherDateOfBirth" class="form-label">Date of Birth</label>
-                        {{-- Ganti type="date" menjadi "text" agar Flatpickr bekerja optimal --}}
-                        <input type="text" class="form-control" id="teacherDateOfBirth" name="date_of_birth"
-                            placeholder="Select date...">
+                        <input type="date" class="form-control" id="teacherDateOfBirth" name="date_of_birth">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-md-6">

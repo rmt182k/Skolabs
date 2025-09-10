@@ -1,5 +1,3 @@
-{{-- File: resources/views/staff/components/modal-staff.blade.php --}}
-
 <div class="modal fade" id="staffModal" tabindex="-1" aria-labelledby="staffModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -10,7 +8,7 @@
             </div>
             <div class="modal-body p-4">
                 <form id="staffForm" class="row g-3">
-                    <input type="hidden" id="staffId">
+                    <input type="hidden" id="staffId" name="id">
 
                     <div class="col-md-6">
                         <label for="staffName" class="form-label">Full Name</label>
@@ -22,6 +20,19 @@
                         <input type="email" class="form-control" id="staffEmail" name="email" required>
                         <div class="invalid-feedback"></div>
                     </div>
+
+                    <div class="col-md-6">
+                        <label for="staffEmployeeId" class="form-label">Employee ID</label>
+                        <input type="text" class="form-control" id="staffEmployeeId" name="employee_id">
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="staffDateOfBirth" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="staffDateOfBirth" name="date_of_birth">
+                        <div class="invalid-feedback"></div>
+                    </div>
+
                     <div class="col-md-6">
                         <label for="staffPosition" class="form-label">Position</label>
                         <input type="text" class="form-control" id="staffPosition" name="position"

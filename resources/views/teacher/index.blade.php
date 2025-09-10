@@ -4,11 +4,6 @@
 
 @section('title', 'Teacher Management')
 
-@push('styles')
-    {{-- Flatpickr CSS untuk date-time picker --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-@endpush
-
 @section('content')
     <div class="container-fluid">
         {{-- Breadcrumb --}}
@@ -49,13 +44,11 @@
             </div>
         </div>
     </div>
-
     {{-- Modal untuk Tambah/Edit Guru --}}
     @include('teacher.components.modal-teacher')
 @endsection
 
 @push('scripts')
     {{-- Flatpickr JS untuk date-time picker --}}
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('assets/js/app/teacher/teacher.js') }}"></script>
 @endpush

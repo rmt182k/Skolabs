@@ -1,5 +1,3 @@
-// File: public/assets/js/app/staff/staff.js
-
 document.addEventListener('DOMContentLoaded', function () {
     // --- KONFIGURASI & VARIABEL GLOBAL ---
     const API_URL = '/api/staffs';
@@ -17,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             { data: null, searchable: false, orderable: false, render: (data, type, row, meta) => meta.row + 1 },
             { data: 'name', defaultContent: '-' },
+            // TAMBAHAN: Menampilkan Employee ID di tabel
+            { data: 'employee_id', defaultContent: '-' },
             { data: 'position', defaultContent: '-' },
             {
                 data: 'status',
@@ -78,6 +78,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('#staffId').val(data.id);
                     $('#staffName').val(data.name);
                     $('#staffEmail').val(data.email);
+                    // TAMBAHAN: Mengisi data Employee ID dan Tanggal Lahir
+                    $('#staffEmployeeId').val(data.employee_id);
+                    $('#staffDateOfBirth').val(data.date_of_birth);
                     $('#staffPosition').val(data.position);
                     $('#staffStatus').val(data.status);
                     staffModal.show();
@@ -118,7 +121,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const staffId = $('#staffId').val();
         let url = staffId ? `${API_URL}/${staffId}` : API_URL;
         let formData = new FormData(this);
-        if (staffId) formData.append('_method', 'PUT');
+        // DIUBAH: Menggunakan 'id' dari form, bukan #staffId
+        if (formData.get('id')) {
+            formData.append('_method', 'PUT');
+            url = `${API_URL}/${formData.get('id')}`;
+        }
+
 
         $('#saveStaffBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
 

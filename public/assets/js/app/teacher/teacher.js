@@ -1,5 +1,3 @@
-// File: public/assets/js/app/teacher/teacher.js
-
 document.addEventListener('DOMContentLoaded', function () {
     // --- KONFIGURASI & VARIABEL GLOBAL ---
     const API_URL = '/api/teachers';
@@ -7,12 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const teacherModal = new bootstrap.Modal(document.getElementById('teacherModal'));
 
     // --- INISIALISASI ---
-    const dateOfBirthPicker = flatpickr("#teacherDateOfBirth", {
-        altInput: true,
-        altFormat: "F j, Y",
-        dateFormat: "Y-m-d",
-        maxDate: "today"
-    });
+    // DIHAPUS: Inisialisasi Flatpickr tidak diperlukan lagi.
+    // const dateOfBirthPicker = flatpickr(...);
 
     const teacherTable = $('#teachers-datatable').DataTable({
         processing: true,
@@ -66,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#teacherForm')[0].reset();
         $('#teacherId').val('');
         clearValidationErrors();
-        dateOfBirthPicker.clear();
+        // DIUBAH: Menggunakan jQuery untuk mengosongkan nilai input tanggal
+        $('#teacherDateOfBirth').val('');
     };
 
     // --- EVENT LISTENERS ---
@@ -88,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('#teacherName').val(data.name);
                     $('#teacherEmail').val(data.email);
                     $('#teacherEmployeeId').val(data.employee_id);
-                    dateOfBirthPicker.setDate(data.date_of_birth, true); // Set tanggal via Flatpickr
+                    // DIUBAH: Menggunakan jQuery untuk mengisi nilai input tanggal
+                    $('#teacherDateOfBirth').val(data.date_of_birth);
                     $('#teacherPhoneNumber').val(data.phone_number);
                     $('#teacherAddress').val(data.address);
                     $('#teacherGender').val(data.gender);

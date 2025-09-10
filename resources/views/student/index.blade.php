@@ -2,11 +2,6 @@
 
 @section('title', 'Student Management')
 
-@push('styles')
-    {{-- Flatpickr CSS untuk date-time picker --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-@endpush
-
 @section('content')
     <div class="container-fluid">
         {{-- Breadcrumb bisa Anda sesuaikan --}}
@@ -46,7 +41,5 @@
 @endsection
 
 @push('scripts')
-    {{-- Flatpickr JS untuk date-time picker --}}
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('assets/js/app/student/student.js') }}"></script>
 @endpush

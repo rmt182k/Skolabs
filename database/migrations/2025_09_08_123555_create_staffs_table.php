@@ -13,6 +13,8 @@ return new class extends Migration {
         Schema::create('staffs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->string('employee_id')->nullable();
+            $table->date('date_of_birth');
             $table->string('position')->nullable(); // Kolom 'position' sebagai ganti 'job_title'
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();

@@ -32,10 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('teacher.index');
     });
 
-    Route::get('/admin', function () {
-        return view('admin.index');
-    });
-
     Route::get('/staff', function () {
         return view('staff.index');
     });
@@ -79,11 +75,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
     Route::post('/api/teachers', [TeacherController::class, 'store'])->name('teachers.store');
     Route::put('/api/teachers/{id}', [TeacherController::class, 'update'])->name('teachers.update');
-
-    Route::get('/api/admins', [AdminController::class, 'index'])->name('admins.index');
-    Route::get('/api/admins/{id}', [AdminController::class, 'show'])->name('admins.show');
-    Route::post('/api/admins', [AdminController::class, 'store'])->name('admins.store');
-    Route::put('/api/admins/{id}', [AdminController::class, 'update'])->name('admins.update');
 
     Route::get('/api/staffs', [StaffController::class, 'index'])->name('staffs.index');
     Route::get('/api/staffs/{id}', [StaffController::class, 'show'])->name('staffs.show');
@@ -132,5 +123,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/assignments/{id}', [AssignmentController::class, 'show'])->name('assignments.show');
     Route::put('/api/assignments/{id}', [AssignmentController::class, 'update'])->name('assignments.update');
     Route::delete('/api/assignments/{id}', [AssignmentController::class, 'destroy'])->name('assignments.destroy');
+
 
 });

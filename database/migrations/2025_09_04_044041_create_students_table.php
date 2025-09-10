@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->date('enrollment_date')->nullable();
             $table->integer('grade_level')->nullable();
             $table->integer('major_id')->nullable();
+            $table->enum('status', ['active', 'graduated', 'dropout', 'suspended', 'transferred', 'on_leave'])->default('active');
             $table->timestamps();
         });
     }
