@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->timestamp('start_date')->nullable();
             $table->timestamp('due_date')->nullable();
 
             $table->string('file_path')->nullable();

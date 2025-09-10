@@ -5,6 +5,7 @@
             <th>Title</th>
             <th>Subject</th>
             <th>Class</th>
+            <th>Start Date</th>
             <th>Due Date</th>
             <th>Actions</th>
         </tr>
@@ -12,3 +13,4 @@
     <tbody>
     </tbody>
 </table>
+

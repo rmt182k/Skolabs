@@ -30,10 +30,15 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="dueDate" class="form-label">Due Date</label>
-                        <input type="text" class="form-control" id="dueDate" name="due_date"
-                            placeholder="Select date and time">
+                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="text" class="form-control" id="startDate" name="start_date" placeholder="Defaults to now if empty">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="dueDate" class="form-label">Due Date</label>
+                            <input type="text" class="form-control" id="dueDate" name="due_date" placeholder="Select date and time">
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="assignmentFile" class="form-label">Attach File (Optional)</label>
@@ -47,8 +52,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" form="assignmentForm" id="saveBtn">Save
-                    Assignment</button>
+                <button type="submit" class="btn btn-primary" form="assignmentForm" id="saveBtn">Save Assignment</button>
             </div>
         </div>
     </div>

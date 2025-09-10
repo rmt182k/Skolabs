@@ -13,7 +13,7 @@ use Exception;
 class AssignmentController extends Controller
 {
     /**
-     * Display a listing of the assignments for teachers.
+     * Display a listing of the assignments.
      */
     public function index(): JsonResponse
     {
@@ -22,19 +22,21 @@ class AssignmentController extends Controller
                 ->select(
                     'a.id',
                     'a.title',
+                    'a.start_date',
                     'a.due_date',
                     's.name as subject_name',
                     'c.name as class_name'
                 )
                 ->leftJoin('subjects as s', 'a.subject_id', '=', 's.id')
                 ->leftJoin('classes as c', 'a.class_id', '=', 'c.id')
-                ->orderBy('a.due_date', 'desc')
+                ->orderBy('a.created_at', 'desc')
                 ->get();
 
             $formattedData = $assignments->map(function ($assignment) {
                 return [
                     'id' => $assignment->id,
                     'title' => $assignment->title,
+                    'start_date' => $assignment->start_date ? date('Y-m-d H:i', strtotime($assignment->start_date)) : '-',
                     'due_date' => $assignment->due_date ? date('Y-m-d H:i', strtotime($assignment->due_date)) : '-',
                     'subject' => ['name' => $assignment->subject_name],
                     'class' => ['name' => $assignment->class_name],
@@ -57,7 +59,8 @@ class AssignmentController extends Controller
             'title' => 'required|string|max:255',
             'subject_id' => 'required|exists:subjects,id',
             'class_id' => 'required|exists:classes,id',
-            'due_date' => 'nullable|date',
+            'start_date' => 'nullable|date',
+            'due_date' => 'nullable|date|after_or_equal:start_date',
             'file' => 'nullable|file|mimes:pdf,docx,pptx,jpg,png,zip|max:10240', // Max 10MB
         ]);
 
@@ -67,6 +70,7 @@ class AssignmentController extends Controller
 
         try {
             $insertData = $request->only('title', 'description', 'subject_id', 'class_id', 'due_date');
+            $insertData['start_date'] = $request->start_date ?? now(); // Default to now if not provided
             $insertData['teacher_id'] = 1; // GANTI DENGAN ID GURU YANG LOGIN
             $insertData['created_at'] = now();
             $insertData['updated_at'] = now();
@@ -100,7 +104,6 @@ class AssignmentController extends Controller
 
     /**
      * Update an existing assignment.
-     * Menggunakan Request karena method asli adalah PUT/PATCH.
      */
     public function update(Request $request, $id): JsonResponse
     {
@@ -108,7 +111,8 @@ class AssignmentController extends Controller
             'title' => 'required|string|max:255',
             'subject_id' => 'required|exists:subjects,id',
             'class_id' => 'required|exists:classes,id',
-            'due_date' => 'nullable|date',
+            'start_date' => 'nullable|date',
+            'due_date' => 'nullable|date|after_or_equal:start_date',
             'file' => 'nullable|file|mimes:pdf,docx,pptx,jpg,png,zip|max:10240',
         ]);
 
@@ -123,15 +127,13 @@ class AssignmentController extends Controller
                 return response()->json(['success' => false, 'message' => 'Assignment not found.'], 404);
             }
 
-            $updateData = $request->only('title', 'description', 'subject_id', 'class_id', 'due_date');
+            $updateData = $request->only('title', 'description', 'subject_id', 'class_id', 'start_date', 'due_date');
             $updateData['updated_at'] = now();
 
             if ($request->hasFile('file')) {
-                // Hapus file lama jika ada
                 if ($assignment->file_path && Storage::exists($assignment->file_path)) {
                     Storage::delete($assignment->file_path);
                 }
-                // Upload file baru
                 $file = $request->file('file');
                 $updateData['file_path'] = $file->store('public/assignments');
                 $updateData['file_name'] = $file->getClientOriginalName();
@@ -148,7 +150,6 @@ class AssignmentController extends Controller
         }
     }
 
-
     /**
      * Remove an assignment.
      */
@@ -161,18 +162,11 @@ class AssignmentController extends Controller
                 return response()->json(['success' => false, 'message' => 'Assignment not found.'], 404);
             }
 
-            // Hapus file dari storage jika ada
             if ($assignment->file_path && Storage::exists($assignment->file_path)) {
                 Storage::delete($assignment->file_path);
             }
 
-            // Hapus record dari database
             DB::table('assignments')->where('id', $id)->delete();
-
-            // Hapus juga semua submission terkait (opsional tapi direkomendasikan)
-            // Lakukan penghapusan file submission juga jika ada
-            // DB::table('assignment_submissions')->where('assignment_id', $id)->delete();
-
             DB::commit();
 
             return response()->json(['success' => true, 'message' => 'Assignment deleted successfully.']);
