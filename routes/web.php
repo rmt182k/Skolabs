@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AssignmentSubmissionController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassStudentController;
 use App\Http\Controllers\EducationalLevelController;
@@ -20,6 +21,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // --- Page View Routes ---
     Route::get('/dashboard', function () {
         return view('dashboard.index');
     });
@@ -64,6 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('assignment.index');
     });
 
+    // --- Student API Routes ---
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/api/students/{id}', [StudentController::class, 'show'])->name('students.show');
     Route::get('/api/students/create-data', [StudentController::class, 'getCreateData'])->name('students.create-data');
@@ -71,26 +74,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/api/students/{id}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/api/students/{id}', [StudentController::class, 'delete'])->name('students.delete');
 
+    // --- Teacher API Routes ---
     Route::get('/api/teachers', [TeacherController::class, 'index'])->name('teachers.index');
     Route::get('/api/teachers/{id}', [TeacherController::class, 'show'])->name('teachers.show');
     Route::post('/api/teachers', [TeacherController::class, 'store'])->name('teachers.store');
     Route::put('/api/teachers/{id}', [TeacherController::class, 'update'])->name('teachers.update');
 
+    // --- Staff API Routes ---
     Route::get('/api/staffs', [StaffController::class, 'index'])->name('staffs.index');
     Route::get('/api/staffs/{id}', [StaffController::class, 'show'])->name('staffs.show');
     Route::post('/api/staffs', [StaffController::class, 'store'])->name('staffs.store');
     Route::put('/api/staffs/{id}', [StaffController::class, 'update'])->name('staffs.update');
 
+    // --- Educational Level API Routes ---
     Route::get('/api/educational-levels', [EducationalLevelController::class, 'index'])->name('educational-levels.index');
     Route::get('/api/educational-levels/{id}', [EducationalLevelController::class, 'show'])->name('educational-levels.show');
     Route::post('api/educational-levels', [EducationalLevelController::class, 'store'])->name('educational-levels.store');
     Route::put('/api/educational-levels/{id}', [EducationalLevelController::class, 'update'])->name('educational-levels.update');
 
+    // --- Major API Routes ---
     Route::get('/api/majors', [MajorController::class, 'index'])->name('majors.index');
     Route::get('/api/majors/{id}', [MajorController::class, 'show'])->name('majors.show');
     Route::post('/api/majors', [MajorController::class, 'store'])->name('majors.store');
     Route::put('/api/majors/{id}', [MajorController::class, 'update'])->name('majors.update');
 
+    // --- Class API Routes ---
     Route::get('/api/class', [ClassController::class, 'index'])->name('class.index');
     Route::post('/api/class', [ClassController::class, 'store'])->name('class.store');
     Route::get('/api/class/create-data', [ClassController::class, 'getCreateData'])->name('class.create-data');
@@ -98,11 +106,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/api/class/{id}', [ClassController::class, 'update'])->name('class.update');
     Route::delete('/api/class/{id}', [ClassController::class, 'destroy'])->name('class.destroy');
 
+    // --- Class Student API Routes ---
     Route::get('/api/class-students', [ClassStudentController::class, 'index']);
     Route::post('/api/class-students', [ClassStudentController::class, 'store']);
     Route::get('/api/class-students/create-data', [ClassStudentController::class, 'getCreateData']);
     Route::delete('/api/class-students/{id}', [ClassStudentController::class, 'destroy']);
 
+    // --- Subject API Routes ---
     Route::get('/api/subjects', [SubjectController::class, 'index'])->name('subjects.index');
     Route::post('/api/subjects', [SubjectController::class, 'store'])->name('subjects.store');
     Route::get('/api/subjects/create-data', [SubjectController::class, 'getCreateData'])->name('subjects.create-data');
@@ -110,6 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/api/subjects/{id}', [SubjectController::class, 'update'])->name('subjects.update');
     Route::delete('/api/subjects/{id}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
+    // --- Learning Material API Routes ---
     Route::get('/api/learning-materials', [LearningMaterialController::class, 'index'])->name('learning-materials.index');
     Route::post('/api/learning-materials', [LearningMaterialController::class, 'store'])->name('learning-materials.store');
     Route::get('/api/learning-materials/create-data', [LearningMaterialController::class, 'getCreateData'])->name('learning-materials.create-data');
@@ -117,6 +128,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/api/learning-materials/{id}', [LearningMaterialController::class, 'update'])->name('learning-materials.update');
     Route::delete('/api/learning-materials/{id}', [LearningMaterialController::class, 'destroy'])->name('learning-materials.destroy');
 
+    // --- Assignment API Routes ---
     Route::get('/api/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
     Route::post('/api/assignments', [AssignmentController::class, 'store'])->name('assignments.store');
     Route::get('/api/assignments/create-data', [AssignmentController::class, 'getCreateData'])->name('assignments.create-data');
@@ -124,5 +136,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/api/assignments/{id}', [AssignmentController::class, 'update'])->name('assignments.update');
     Route::delete('/api/assignments/{id}', [AssignmentController::class, 'destroy'])->name('assignments.destroy');
 
+    Route::get('/assignment-submission', [AssignmentSubmissionController::class, 'viewAllSubmissionsPage'])->name('all-submissions.page');
+    Route::get('/assignment/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissionsPage'])->name('assignment.submissions.page');
+    Route::get('/api/assignment-submissions', [AssignmentSubmissionController::class, 'getAllSubmissions'])->name('all-submissions.api.index');
+    Route::get('/api/assignments/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'index'])->name('assignment.submissions.index');
+    Route::get('/api/submissions/{submissionId}', [AssignmentSubmissionController::class, 'show'])->name('submission.show');
+    Route::post('/api/submissions/{submissionId}/grade', [AssignmentSubmissionController::class, 'grade'])->name('submission.grade');
 
 });
