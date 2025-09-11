@@ -8,7 +8,7 @@
     <div class="offcanvas-body p-0">
         <div data-simplebar class="h-100">
             <div class="card mb-0 p-3">
-                <h5 class="mt-0 font-16 fw-bold mb-3">Choose Layout</h5>
+                {{-- <h5 class="mt-0 font-16 fw-bold mb-3">Choose Layout</h5>
                 <div class="row">
                     <div class="col-4">
                         <div class="form-check card-radio">
@@ -63,7 +63,7 @@
                         </div>
                         <h5 class="font-14 text-center text-muted mt-2">Horizontal</h5>
                     </div>
-                </div>
+                </div> --}}
 
                 <h5 class="my-3 font-16 fw-bold">Color Scheme</h5>
 
@@ -823,12 +823,8 @@
     </div>
     <div class="offcanvas-footer border-top p-3 text-center">
         <div class="row">
-            <div class="col-6">
-                <button type="button" class="btn btn-light w-100" id="reset-layout">Reset</button>
-            </div>
-            <div class="col-6">
-                <a href="https://coderthemes.com/hyper/" target="_blank" role="button"
-                    class="btn btn-primary w-100">Buy Now</a>
+            <div class="col-12">
+                <button type="button" class="btn btn-primary w-100" id="reset-layout">Reset</button>
             </div>
         </div>
     </div>

@@ -11,6 +11,9 @@ use Exception;
 
 class ClassController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(): JsonResponse
     {
         try {
@@ -48,13 +51,16 @@ class ClassController extends Controller
         }
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:classes,name',
             'grade_level' => 'required|integer|between:1,12',
             'educational_level_id' => 'required|exists:educational_levels,id',
-            'major_id' => 'required|exists:majors,id',
+            'major_id' => 'nullable|exists:majors,id', // DIUBAH: Izinkan major_id kosong
             'teacher_id' => 'required|exists:teachers,id',
         ]);
 
@@ -67,7 +73,7 @@ class ClassController extends Controller
                 'name' => $request->name,
                 'grade_level' => $request->grade_level,
                 'educational_level_id' => $request->educational_level_id,
-                'major_id' => $request->major_id,
+                'major_id' => $request->major_id, // Akan menjadi NULL jika tidak ada
                 'teacher_id' => $request->teacher_id,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -79,21 +85,18 @@ class ClassController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show($id): JsonResponse
     {
         try {
-            $class = DB::table('classes')
-                ->select('classes.*', 'majors.educational_level_id as major_educational_level_id')
-                ->join('majors', 'classes.major_id', '=', 'majors.id')
-                ->where('classes.id', $id)
-                ->first();
+            // DIUBAH: Query hanya ke tabel classes agar tidak error jika major_id adalah NULL
+            $class = DB::table('classes')->where('id', $id)->first();
 
             if (!$class) {
                 return response()->json(['success' => false, 'message' => 'Class not found.'], 404);
             }
-            // Rename for consistency in frontend if needed
-            $class->major_educational_level_id = $class->educational_level_id;
-
 
             return response()->json(['success' => true, 'data' => $class]);
         } catch (Exception $e) {
@@ -102,13 +105,16 @@ class ClassController extends Controller
         }
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:classes,name,' . $id,
             'grade_level' => 'required|integer|between:1,12',
             'educational_level_id' => 'required|exists:educational_levels,id',
-            'major_id' => 'required|exists:majors,id',
+            'major_id' => 'nullable|exists:majors,id', // DIUBAH: Izinkan major_id kosong
             'teacher_id' => 'required|exists:teachers,id',
         ]);
 
@@ -121,13 +127,14 @@ class ClassController extends Controller
                 'name' => $request->name,
                 'grade_level' => $request->grade_level,
                 'educational_level_id' => $request->educational_level_id,
-                'major_id' => $request->major_id,
+                'major_id' => $request->major_id, // Akan menjadi NULL jika tidak ada
                 'teacher_id' => $request->teacher_id,
                 'updated_at' => now(),
             ]);
 
             if ($affected === 0) {
-                return response()->json(['success' => false, 'message' => 'Class not found or no changes were made.'], 404);
+                // Bisa jadi tidak ada perubahan atau data tidak ditemukan
+                return response()->json(['success' => true, 'message' => 'No changes were made to the class.']);
             }
 
             return response()->json(['success' => true, 'message' => 'Class updated successfully.']);
@@ -137,6 +144,9 @@ class ClassController extends Controller
         }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy($id): JsonResponse
     {
         try {
@@ -151,6 +161,9 @@ class ClassController extends Controller
         }
     }
 
+    /**
+     * Get data for create/edit form.
+     */
     public function getCreateData(): JsonResponse
     {
         try {

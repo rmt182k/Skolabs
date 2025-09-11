@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('name')->comment('Generated name, e.g., "10 RPL 1"');
             $table->tinyInteger('grade_level')->comment('e.g., 10, 11, 12');
             $table->unsignedBigInteger('educational_level_id');
-            $table->unsignedBigInteger('major_id');
+            $table->unsignedBigInteger('major_id')->nullable();
             $table->unsignedBigInteger('teacher_id')->comment('Homeroom Teacher');
             $table->timestamps();
         });

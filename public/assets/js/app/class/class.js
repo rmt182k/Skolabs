@@ -2,7 +2,6 @@
 $(document).ready(function () {
     // --- KONFIGURASI & VARIABEL GLOBAL ---
     const API_URL = '/api/class';
-    const EDUCATIONAL_LEVELS_API_URL = '/api/educational-levels';
     const MAJORS_API_URL = '/api/majors';
     const CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
     const classModal = new bootstrap.Modal(document.getElementById('classModal'));
@@ -14,33 +13,47 @@ $(document).ready(function () {
             url: API_URL,
             dataSrc: 'data'
         },
-        columns: [
-            { data: 'name' },
-            { data: 'grade_level', defaultContent: '-' },
-            { data: 'educational_level.name', defaultContent: '<span class="text-muted">N/A</span>' },
-            { data: 'major.name', defaultContent: '<span class="text-muted">N/A</span>' },
-            { data: 'teacher.name', defaultContent: '<span class="text-muted">N/A</span>' },
-            {
-                data: 'id',
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `
+        columns: [{
+            data: 'name'
+        }, {
+            data: 'grade_level',
+            defaultContent: '-'
+        }, {
+            data: 'educational_level.name',
+            defaultContent: '<span class="text-muted">N/A</span>'
+        }, {
+            data: 'major.name',
+            defaultContent: '<span class="text-muted">N/A</span>'
+        }, {
+            data: 'teacher.name',
+            defaultContent: '<span class="text-muted">N/A</span>'
+        }, {
+            data: 'id',
+            orderable: false,
+            searchable: false,
+            render: function (data, type, row) {
+                return `
                         <button class="btn btn-sm btn-primary edit-btn" data-id="${data}"><i class="fas fa-edit"></i> Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${data}"><i class="fas fa-trash"></i> Delete</button>
                     `;
-                }
             }
-        ]
+        }]
     });
 
-    // --- FUNGSI BANTUAN ---
-    const showNotification = (icon, title) => Swal.fire({ icon, title, timer: 2000, showConfirmButton: false });
+    const showNotification = (icon, title) => Swal.fire({
+        icon,
+        title,
+        timer: 2000,
+        showConfirmButton: false
+    });
 
     const populateDropdown = (selector, data, defaultOptionText, valueKey = 'id', textKey = 'name') => {
         const dropdown = $(selector);
         dropdown.html(`<option value="">${defaultOptionText}</option>`);
-        data.forEach(item => dropdown.append($('<option>', { value: item[valueKey], text: item[textKey] })));
+        data.forEach(item => dropdown.append($('<option>', {
+            value: item[valueKey],
+            text: item[textKey]
+        })));
     };
 
     const resetForm = () => {
@@ -53,29 +66,44 @@ $(document).ready(function () {
 
     const updateGeneratedClassName = () => {
         const gradeText = $('#gradeLevel option:selected').text();
+        const levelText = $('#educationalLevelId option:selected').text();
         const majorText = $('#majorId option:selected').text();
-
-        if (gradeText && gradeText !== 'Select Grade' && majorText && majorText !== 'Select Major' && majorText !== 'Select Level First' && majorText !== 'No majors available') {
-            const className = `${gradeText} ${majorText}`;
-            $('#generatedClassName').val(className);
-        } else {
-            $('#generatedClassName').val('');
+        const majorSelect = $('#majorId');
+        let className = '';
+        if (gradeText && gradeText !== 'Select Grade' && levelText && levelText !== 'Select Level') {
+            if (!majorSelect.prop('disabled') && majorText && majorText !== 'Select Major') {
+                className = `${gradeText} ${majorText}`;
+            } else {
+                className = `${gradeText} ${levelText}`;
+            }
         }
+        $('#generatedClassName').val(className.trim());
     };
 
     // --- FUNGSI AJAX ---
-    function fetchInitialData(levelId = null, majorId = null, teacherId = null) {
+
+    // DIUBAH: Tambahkan parameter 'gradeLevel'
+    function fetchInitialData(levelId = null, majorId = null, teacherId = null, gradeLevel = null) {
         $.getJSON(`${API_URL}/create-data`).done(response => {
             if (response.success) {
-                const { teachers, educational_levels } = response.data;
+                const {
+                    teachers,
+                    educational_levels
+                } = response.data;
                 const gradeSelect = $('#gradeLevel');
                 gradeSelect.html('<option value="">Select Grade</option>');
                 for (let i = 1; i <= 12; i++) {
                     gradeSelect.append(`<option value="${i}">${i}</option>`);
                 }
+
                 populateDropdown('#educationalLevelId', educational_levels, 'Select Level');
                 populateDropdown('#teacherId', teachers, 'Select a Teacher');
 
+                // DIUBAH: Logika untuk memilih nilai dipindahkan ke sini
+                // Ini akan dieksekusi SETELAH semua dropdown terisi
+                if (gradeLevel) {
+                    $('#gradeLevel').val(gradeLevel);
+                }
                 if (levelId) {
                     $('#educationalLevelId').val(levelId).trigger('change', [majorId]);
                 }
@@ -110,7 +138,7 @@ $(document).ready(function () {
     $('#classAddBtn').on('click', function () {
         resetForm();
         $('#classModalLabel').text('Add New Class');
-        fetchInitialData();
+        fetchInitialData(); // Panggil tanpa parameter untuk form tambah
         classModal.show();
     });
 
@@ -118,7 +146,7 @@ $(document).ready(function () {
         fetchMajors($(this).val(), majorIdToSelect);
     });
 
-    $('#gradeLevel, #majorId').on('change', updateGeneratedClassName);
+    $('#gradeLevel, #majorId, #educationalLevelId').on('change', updateGeneratedClassName);
 
     $('#classForm').on('submit', function (e) {
         e.preventDefault();
@@ -155,8 +183,13 @@ $(document).ready(function () {
                 const data = response.data;
                 $('#classModalLabel').text('Edit Class');
                 $('#classId').val(data.id);
-                fetchInitialData(data.educational_level_id, data.major_id, data.teacher_id);
-                $('#gradeLevel').val(data.grade_level);
+
+                // DIUBAH: Kirim 'data.grade_level' sebagai parameter ke fungsi fetchInitialData
+                fetchInitialData(data.educational_level_id, data.major_id, data.teacher_id, data.grade_level);
+
+                // DIUBAH: Baris ini dihapus dari sini karena sudah ditangani di dalam fetchInitialData
+                // $('#gradeLevel').val(data.grade_level);
+
                 classModal.show();
             }
         }).fail(() => showNotification('error', 'Failed to fetch class data.'));
@@ -188,4 +221,3 @@ $(document).ready(function () {
         });
     });
 });
-

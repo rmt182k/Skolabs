@@ -18,9 +18,6 @@ return new class extends Migration {
             $table->string('position')->nullable(); // Kolom 'position' sebagai ganti 'job_title'
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
-
-            // Index untuk performa query
-            $table->index('user_id');
         });
     }
 
