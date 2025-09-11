@@ -1,6 +1,9 @@
 @extends('layouts.auth')
 
 @section('title', 'Assign Students')
+@section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endsection
 
 @section('content')
     <div class="container-fluid">
@@ -33,9 +36,7 @@
 @endsection
 
 @push('scripts')
-    {{-- Pastikan Anda sudah menginstal select2 jika belum --}}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="{{ asset('assets/js/app/class-student/class-student.js') }}"></script>
     <script src="{{ asset('assets/js/app/utils/tableConfig.js') }}"></script>
 @endpush

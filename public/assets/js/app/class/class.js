@@ -1,126 +1,172 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // API endpoint
+// File: public/assets/js/app/class/class.js
+$(document).ready(function () {
+    // --- KONFIGURASI & VARIABEL GLOBAL ---
     const API_URL = '/api/class';
+    const EDUCATIONAL_LEVELS_API_URL = '/api/educational-levels';
+    const MAJORS_API_URL = '/api/majors';
+    const CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+    const classModal = new bootstrap.Modal(document.getElementById('classModal'));
 
-    // Function to load majors and teachers into select dropdowns
-    function loadCreateData() {
-        return $.ajax({
-            url: `${API_URL}/create-data`,
-            method: 'GET'
-        });
-    }
-
-    // Initialize DataTable
-    const classTable = $('#class-datatable').DataTable({
+    // --- INISIALISASI DATATABLE ---
+    const table = $('#classesTable').DataTable({
         processing: true,
         ajax: {
             url: API_URL,
-            dataSrc: function (json) {
-                if (!json.success) {
-                    Swal.fire({ icon: 'error', title: 'Error', text: json.message || 'Failed to load class data.' });
-                    return [];
-                }
-                return json.data || [];
-            },
-            error: function (xhr) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to fetch class data: ' + xhr.statusText });
-            }
+            dataSrc: 'data'
         },
         columns: [
-            { data: 'id' },
-            { data: 'name', defaultContent: '-' },
-            { data: 'major.name', defaultContent: '-' },
-            { data: 'teacher.name', defaultContent: '-' },
+            { data: 'name' },
+            { data: 'grade_level', defaultContent: '-' },
+            { data: 'educational_level.name', defaultContent: '<span class="text-muted">N/A</span>' },
+            { data: 'major.name', defaultContent: '<span class="text-muted">N/A</span>' },
+            { data: 'teacher.name', defaultContent: '<span class="text-muted">N/A</span>' },
             {
-                data: null,
+                data: 'id',
                 orderable: false,
+                searchable: false,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-warning edit-btn" data-id="${row.id}"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}"><i class="fas fa-trash"></i> Delete</button>
+                        <button class="btn btn-sm btn-primary edit-btn" data-id="${data}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${data}"><i class="fas fa-trash"></i> Delete</button>
                     `;
                 }
             }
         ]
     });
 
-    // Handle "Add New Class" button click
-    $('#classAddBtn').on('click', function () {
+    // --- FUNGSI BANTUAN ---
+    const showNotification = (icon, title) => Swal.fire({ icon, title, timer: 2000, showConfirmButton: false });
+
+    const populateDropdown = (selector, data, defaultOptionText, valueKey = 'id', textKey = 'name') => {
+        const dropdown = $(selector);
+        dropdown.html(`<option value="">${defaultOptionText}</option>`);
+        data.forEach(item => dropdown.append($('<option>', { value: item[valueKey], text: item[textKey] })));
+    };
+
+    const resetForm = () => {
         $('#classForm')[0].reset();
         $('#classId').val('');
-        $('#classModalLabel').text('👤 Add New Class');
-        loadCreateData().done(function(response) {
+        $('#generatedClassName').val('');
+        $('#majorId').prop('disabled', true).html('<option value="">Select Level First</option>');
+        $('.form-control, .form-select').removeClass('is-invalid');
+    };
+
+    const updateGeneratedClassName = () => {
+        const gradeText = $('#gradeLevel option:selected').text();
+        const majorText = $('#majorId option:selected').text();
+
+        if (gradeText && gradeText !== 'Select Grade' && majorText && majorText !== 'Select Major' && majorText !== 'Select Level First' && majorText !== 'No majors available') {
+            const className = `${gradeText} ${majorText}`;
+            $('#generatedClassName').val(className);
+        } else {
+            $('#generatedClassName').val('');
+        }
+    };
+
+    // --- FUNGSI AJAX ---
+    function fetchInitialData(levelId = null, majorId = null, teacherId = null) {
+        $.getJSON(`${API_URL}/create-data`).done(response => {
             if (response.success) {
-                const majors = response.data.majors;
-                const teachers = response.data.teachers;
-                const majorSelect = $('#majorId');
-                const teacherSelect = $('#teacherId');
+                const { teachers, educational_levels } = response.data;
+                const gradeSelect = $('#gradeLevel');
+                gradeSelect.html('<option value="">Select Grade</option>');
+                for (let i = 1; i <= 12; i++) {
+                    gradeSelect.append(`<option value="${i}">${i}</option>`);
+                }
+                populateDropdown('#educationalLevelId', educational_levels, 'Select Level');
+                populateDropdown('#teacherId', teachers, 'Select a Teacher');
 
-                majorSelect.empty().append('<option value="">Select Major</option>');
-                majors.forEach(function (major) {
-                    majorSelect.append(`<option value="${major.id}">${major.name}</option>`);
-                });
-
-                teacherSelect.empty().append('<option value="">Select Teacher</option>');
-                teachers.forEach(function (teacher) {
-                    teacherSelect.append(`<option value="${teacher.id}">${teacher.name}</option>`);
-                });
+                if (levelId) {
+                    $('#educationalLevelId').val(levelId).trigger('change', [majorId]);
+                }
+                if (teacherId) {
+                    $('#teacherId').val(teacherId);
+                }
             }
-        });
-        $('#classModal').modal('show');
+        }).fail(() => showNotification('error', 'Failed to load initial data'));
+    }
+
+    function fetchMajors(levelId, selectedMajorId = null) {
+        const majorSelect = $('#majorId');
+        if (!levelId) {
+            majorSelect.prop('disabled', true).html('<option value="">Select Level First</option>');
+            return;
+        }
+        $.getJSON(`${MAJORS_API_URL}?educational_level_id=${levelId}`).done(response => {
+            if (response.success && response.data.length > 0) {
+                populateDropdown('#majorId', response.data, 'Select Major');
+                majorSelect.prop('disabled', false);
+                if (selectedMajorId) {
+                    majorSelect.val(selectedMajorId);
+                }
+            } else {
+                majorSelect.prop('disabled', true).html('<option value="">No majors available</option>');
+            }
+            updateGeneratedClassName();
+        }).fail(() => showNotification('error', 'Failed to load majors'));
+    }
+
+    // --- EVENT LISTENERS ---
+    $('#classAddBtn').on('click', function () {
+        resetForm();
+        $('#classModalLabel').text('Add New Class');
+        fetchInitialData();
+        classModal.show();
     });
 
-    // Handle "Edit" button click
-    $('#class-datatable').on('click', '.edit-btn', function () {
-        const classId = $(this).data('id');
-        loadCreateData().done(function(response) {
-            if (response.success) {
-                const majors = response.data.majors;
-                const teachers = response.data.teachers;
-                const majorSelect = $('#majorId');
-                const teacherSelect = $('#teacherId');
+    $('#educationalLevelId').on('change', function (event, majorIdToSelect) {
+        fetchMajors($(this).val(), majorIdToSelect);
+    });
 
-                majorSelect.empty().append('<option value="">Select Major</option>');
-                majors.forEach(function (major) {
-                    majorSelect.append(`<option value="${major.id}">${major.name}</option>`);
-                });
+    $('#gradeLevel, #majorId').on('change', updateGeneratedClassName);
 
-                teacherSelect.empty().append('<option value="">Select Teacher</option>');
-                teachers.forEach(function (teacher) {
-                    teacherSelect.append(`<option value="${teacher.id}">${teacher.name}</option>`);
-                });
+    $('#classForm').on('submit', function (e) {
+        e.preventDefault();
+        updateGeneratedClassName();
+        $('#saveClassBtn').text('Saving...').prop('disabled', true);
+        const classId = $('#classId').val();
+        let method = classId ? 'PUT' : 'POST';
+        let url = classId ? `${API_URL}/${classId}` : API_URL;
+        let formData = $(this).serialize();
+        if (method === 'PUT') formData += '&_method=PUT';
 
-                $.ajax({
-                    url: `${API_URL}/${classId}`,
-                    method: 'GET',
-                    success: function (response) {
-                        if (response.success) {
-                            const data = response.data;
-                            $('#classModalLabel').text('✏️ Edit Class');
-                            $('#classId').val(data.id);
-                            $('#className').val(data.name);
-                            $('#majorId').val(data.major_id);
-                            $('#teacherId').val(data.teacher_id);
-                            $('#classModal').modal('show');
-                        } else {
-                            Swal.fire('Error!', response.message, 'error');
-                        }
-                    },
-                    error: function () {
-                        Swal.fire('Error!', 'Failed to fetch class data.', 'error');
-                    }
-                });
-            }
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: formData,
+            headers: { 'X-CSRF-TOKEN': CSRF_TOKEN },
+            success: (response) => {
+                if (response.success) {
+                    classModal.hide();
+                    showNotification('success', response.message);
+                    table.ajax.reload(null, false);
+                }
+            },
+            error: () => showNotification('error', 'An error occurred'),
+            complete: () => $('#saveClassBtn').text('Save changes').prop('disabled', false)
         });
     });
 
-    // Handle "Delete" button click
-    $('#class-datatable').on('click', '.delete-btn', function () {
+    $('#classesTable').on('click', '.edit-btn', function () {
         const classId = $(this).data('id');
-        const className = $(this).data('name');
+        $.getJSON(`${API_URL}/${classId}`).done(response => {
+            if (response.success) {
+                resetForm();
+                const data = response.data;
+                $('#classModalLabel').text('Edit Class');
+                $('#classId').val(data.id);
+                fetchInitialData(data.educational_level_id, data.major_id, data.teacher_id);
+                $('#gradeLevel').val(data.grade_level);
+                classModal.show();
+            }
+        }).fail(() => showNotification('error', 'Failed to fetch class data.'));
+    });
+
+    $('#classesTable').on('click', '.delete-btn', function () {
+        const classId = $(this).data('id');
         Swal.fire({
             title: 'Are you sure?',
-            text: `You are about to delete ${className}. This action cannot be undone!`,
+            text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -131,54 +177,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 $.ajax({
                     url: `${API_URL}/${classId}`,
                     method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire('Deleted!', response.message, 'success');
-                            classTable.ajax.reload(null, false);
-                        } else {
-                            Swal.fire('Failed!', response.message, 'error');
-                        }
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    success: (response) => {
+                        showNotification('success', response.message);
+                        table.ajax.reload(null, false);
                     },
-                    error: function () {
-                        Swal.fire('Error!', 'An error occurred while deleting the class.', 'error');
-                    }
+                    error: () => showNotification('error', 'Failed to delete the class.')
                 });
             }
         });
     });
-
-    // Handle Form Submit
-    $('#classForm').on('submit', function (e) {
-        e.preventDefault();
-        const classId = $('#classId').val();
-        const method = classId ? 'PUT' : 'POST';
-        const url = classId ? `${API_URL}/${classId}` : API_URL;
-
-        $.ajax({
-            url: url,
-            method: method,
-            data: $(this).serialize(),
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            success: function (response) {
-                if (response.success) {
-                    $('#classModal').modal('hide');
-                    Swal.fire('Success!', response.message, 'success');
-                    classTable.ajax.reload();
-                } else {
-                    Swal.fire('Error!', response.message, 'error');
-                }
-            },
-            error: function (xhr) {
-                const errors = xhr.responseJSON?.errors;
-                if (errors) {
-                    let errorMsg = 'Please fix the following errors:\n';
-                    Object.values(errors).forEach(err => errorMsg += `- ${err[0]}\n`);
-                    Swal.fire('Validation Error!', errorMsg, 'error');
-                } else {
-                    Swal.fire('Error!', 'Failed to save class data.', 'error');
-                }
-            }
-        });
-    });
 });
+

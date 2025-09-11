@@ -13,9 +13,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Subject List</h5>
-                        <button id="subjectAddBtn" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i> Add New Subject
-                        </button>
+                        <button id="addSubjectBtn" class="btn btn-primary mb-3">Add New Subject</button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -31,5 +29,7 @@
 @endsection
 
 @push('scripts')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('assets/js/app/subject/subject.js') }}"></script>
 @endpush

@@ -1,13 +1,11 @@
-<table id="subject-datatable" class="table dt-responsive nowrap w-100">
+<table id="subjectsTable" class="table table-bordered table-striped" style="width:100%">
     <thead>
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Code</th>
-            <th>Teacher</th>
+            <th>Teachers</th>
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>

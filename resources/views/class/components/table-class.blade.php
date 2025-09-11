@@ -1,10 +1,11 @@
-<table id="class-datatable" class="table dt-responsive nowrap w-100">
+<table id="classesTable" class="table table-bordered table-striped dt-responsive nowrap" style="width:100%">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
+            <th>Class Name</th>
+            <th>Grade</th>
+            <th>Level</th>
             <th>Major</th>
-            <th>Teacher</th>
+            <th>Homeroom Teacher</th>
             <th>Actions</th>
         </tr>
     </thead>
