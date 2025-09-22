@@ -14,18 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('assignment_id');
             $table->unsignedBigInteger('student_id');
-
-            $table->string('submission_type', 50);
-            $table->text('content')->nullable();
-            $table->string('file_path')->nullable();
-            $table->string('file_name')->nullable();
-
             $table->timestamp('submitted_at')->useCurrent();
-
-            $table->string('status', 50)->default('submitted');
-            $table->decimal('grade', 5, 2)->nullable();
-            $table->text('feedback')->nullable();
-
+            $table->string('status', 50)->default('submitted')->comment('Contoh: submitted, graded, late');
+            $table->decimal('total_grade', 5, 2)->nullable();
+            $table->text('feedback')->nullable()->comment('Feedback umum dari guru untuk submission ini');
             $table->timestamps();
         });
     }

@@ -65,6 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assignment', function () {
         return view('assignment.index');
     });
+    Route::get('/assignment/create', function () {
+        return view('assignment.components.form');
+    });
 
     // --- Student API Routes ---
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
@@ -130,12 +133,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- Assignment API Routes ---
     Route::get('/api/assignments', [AssignmentController::class, 'index'])->name('assignments.index');
+    Route::get('/assignments/{id}/edit', [AssignmentController::class, 'edit'])->name('assignments.index');
     Route::post('/api/assignments', [AssignmentController::class, 'store'])->name('assignments.store');
     Route::get('/api/assignments/create-data', [AssignmentController::class, 'getCreateData'])->name('assignments.create-data');
     Route::get('/api/assignments/{id}', [AssignmentController::class, 'show'])->name('assignments.show');
     Route::put('/api/assignments/{id}', [AssignmentController::class, 'update'])->name('assignments.update');
     Route::delete('/api/assignments/{id}', [AssignmentController::class, 'destroy'])->name('assignments.destroy');
 
+    // --- Assignment Submission API Routes ---
     Route::get('/assignment-submission', [AssignmentSubmissionController::class, 'viewAllSubmissionsPage'])->name('all-submissions.page');
     Route::get('/assignment/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissionsPage'])->name('assignment.submissions.page');
     Route::get('/api/assignment-submissions', [AssignmentSubmissionController::class, 'getAllSubmissions'])->name('all-submissions.api.index');
