@@ -40,7 +40,7 @@
         </a>
 
         <!-- item-->
-        <a href="javascript:void(0);" class="dropdown-item">
+        <a href="javascript:void(0);" id="logout-button" class="dropdown-item">
             <i class="ri-login-circle-line font-16 me-1"></i>
             <span>Logout</span>
         </a>

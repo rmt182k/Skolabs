@@ -14,14 +14,12 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0"><i class="fas fa-tasks me-2"></i>Daftar Tugas</h5>
-                {{-- Tombol ini mengarah ke halaman create, bukan membuka modal --}}
                 <a href="{{ url('/assignment/create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>Tambah Tugas Baru
                 </a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    {{-- PERUBAHAN UTAMA: Menambahkan data-edit-url untuk dibaca oleh JavaScript --}}
                     <table id="assignment-datatable"
                            class="table table-bordered table-striped table-hover dt-responsive nowrap" style="width:100%"
                            data-edit-url="{{ url('/assignments') }}">
@@ -37,7 +35,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Konten diisi oleh DataTables secara dinamis --}}
                         </tbody>
                     </table>
                 </div>

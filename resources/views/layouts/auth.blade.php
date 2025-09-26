@@ -135,6 +135,7 @@
     <script src="{{ asset('assets/vendor/datatables/dataTables.select.min.js') }}"></script>
     <!-- Fixed Header-->
     <script src="{{ asset('assets/vendor/datatables/dataTables.fixedHeader.min.js') }}"></script>
+    <script src="{{ asset('assets/js/app/utils/userConfig.js') }}"></script>
 
     @stack('scripts')
 
