@@ -68,6 +68,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assignment/create', function () {
         return view('assignment.components.form');
     });
+     Route::get('/module-management', function () {
+        return view('module-management.index');
+    });
 
     // --- Student API Routes ---
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');

@@ -185,8 +185,8 @@
                         </a>
                         <div class="collapse" id="sidebarSettings">
                             <ul class="side-nav-second-level">
-                                <li><a href="#">User Management</a></li>
-                                <li><a href="#">System Config</a></li>
+                                <li><a href="/sidebar-management">User Management</a></li>
+                                <li><a href="/module-management">Module Management</a></li>
                             </ul>
                         </div>
                     </li>
