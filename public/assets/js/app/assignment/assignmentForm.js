@@ -10,7 +10,6 @@ $(function () {
     const emptyState = $('#empty-state');
     const questionCounter = $('#question-counter');
 
-    // Ambil semua template dari HTML
     const templates = {
         question: $('#question-template')[0].content,
         answerText: $('#answer-text-template')[0].content,
@@ -22,20 +21,13 @@ $(function () {
     // ======================================================================
     // INISIALISASI HALAMAN
     // ======================================================================
-
-    // Jalankan logika utama berdasarkan mode
     if (isEdit) {
-        // --- MODE EDIT ---
-        // 1. Isi dropdown subject & class
         populateSubjects().then(() => {
             populateClasses().then(() => {
-                // 2. Setelah dropdown siap, ambil data dari API dan isi form
                 populateFormForEdit();
             });
         });
     } else {
-        // --- MODE CREATE ---
-        // Cukup isi dropdown dan set tanggal default
         populateSubjects();
         populateClasses();
         const now = new Date();
@@ -43,22 +35,14 @@ $(function () {
         $('#startDate').val(now.toISOString().slice(0, 10));
     }
 
-    // Panggil updateUI saat halaman pertama kali dimuat
     updateUI();
-
 
     // ======================================================================
     // FUNGSI-FUNGSI AJAX
     // ======================================================================
-
-    /**
-     * Mengisi dropdown Subjects. Mengembalikan Promise agar bisa ditunggu.
-     */
     function populateSubjects() {
         return $.ajax({
-            url: '/api/subjects',
-            method: 'GET',
-            success: function (response) {
+            url: '/api/subjects', method: 'GET', success: function (response) {
                 const dropdown = $('#subjectId');
                 dropdown.empty().append($('<option>', {}));
                 if (response.success && response.data.length > 0) {
@@ -66,22 +50,14 @@ $(function () {
                         dropdown.append($('<option>', { value: value.id, text: value.name }));
                     });
                 }
-                dropdown.select2({
-                    placeholder: 'Search and select a subject',
-                    width: '100%'
-                });
+                dropdown.select2({ placeholder: 'Search and select a subject', width: '100%' });
             }
         });
     }
 
-    /**
-     * Mengisi dropdown Classes. Mengembalikan Promise agar bisa ditunggu.
-     */
     function populateClasses() {
         return $.ajax({
-            url: '/api/class',
-            method: 'GET',
-            success: function (response) {
+            url: '/api/class', method: 'GET', success: function (response) {
                 const dropdown = $('#classId');
                 dropdown.empty();
                 if (response.success && response.data.length > 0) {
@@ -89,52 +65,40 @@ $(function () {
                         dropdown.append($('<option>', { value: value.id, text: value.name }));
                     });
                 }
-                dropdown.select2({
-                    placeholder: 'Choose Class(es)',
-                    width: '100%'
-                });
+                dropdown.select2({ placeholder: 'Choose Class(es)', width: '100%' });
             }
         });
     }
 
-    /**
-     * Mengambil data assignment (dari API) dan mengisi seluruh form dalam mode EDIT.
-     */
     function populateFormForEdit() {
-        // Ambil data assignment dari API menggunakan method show() di controller
-        $.get(`/api/assignments/${assignmentId}`, function(response) {
+        $.get(`/api/assignments/${assignmentId}`, function (response) {
             if (response.success) {
                 const data = response.data;
+                $('#assignmentTitle').val(data.title);
+                $('#assignmentType').val(data.assignment_type);
+                $('#description').val(data.description);
+                if (data.start_date) $('#startDate').val(data.start_date.split(' ')[0]);
+                if (data.due_date) $('#dueDate').val(data.due_date.split(' ')[0]);
 
-                // Isi dropdown Select2
                 $('#subjectId').val(data.subject_id).trigger('change');
                 $('#classId').val(data.class_id).trigger('change');
 
-                // Bangun kembali (rebuild) semua pertanyaan
                 if (data.questions && data.questions.length > 0) {
-                    data.questions.forEach(question => {
-                        addQuestion(question);
-                    });
+                    data.questions.forEach(question => addQuestion(question));
                 }
-                updateUI(); // Perbarui UI setelah semua pertanyaan dimuat
+                updateUI();
             } else {
                 alert('Gagal memuat data tugas.');
                 console.error(response.message);
             }
-        }).fail(function() {
+        }).fail(function () {
             alert('Terjadi kesalahan saat mengambil data tugas.');
         });
     }
 
-
     // ======================================================================
-    // FUNGSI-FUNGSI UNTUK MEMBANGUN FORM SOAL (QUESTION BUILDER)
+    // FUNGSI-FUNGSI UNTUK MEMBANGUN FORM SOAL
     // ======================================================================
-
-    /**
-     * Menambah kartu pertanyaan baru. Bisa diisi dengan data jika dalam mode edit.
-     * @param {object|null} data - Data pertanyaan yang sudah ada.
-     */
     function addQuestion(data = null) {
         const newQuestionFragment = document.importNode(templates.question, true);
         const questionCard = $(newQuestionFragment.querySelector('.question-card'));
@@ -146,16 +110,10 @@ $(function () {
         }
 
         questionBuilder.append(questionCard);
-
         const selectElement = questionCard.find('.question-type-select')[0];
         renderAnswerContainer(selectElement, data);
     }
 
-    /**
-     * Merender container jawaban sesuai tipe soal. Bisa diisi dengan data.
-     * @param {HTMLElement} selectElement - Elemen <select> tipe soal.
-     * @param {object|null} data - Data pertanyaan yang sudah ada.
-     */
     function renderAnswerContainer(selectElement, data = null) {
         const questionCard = $(selectElement).closest('.question-card');
         const answerContainer = questionCard.find('.answer-container');
@@ -163,46 +121,73 @@ $(function () {
         answerContainer.empty();
 
         if (selectedType === 'text') {
-            const textAnswerNode = document.importNode(templates.answerText, true);
-            if (data) $(textAnswerNode).find('.correct-answer-input').val(data.correct_answer);
-            answerContainer.append(textAnswerNode);
+            const node = document.importNode(templates.answerText, true);
+            if (data) $(node).find('.correct-answer-input').val(data.correct_answer);
+            answerContainer.append(node);
         } else if (selectedType === 'essay') {
-            const essayAnswerNode = document.importNode(templates.answerEssay, true);
-            if (data) $(essayAnswerNode).find('.correct-answer-textarea').val(data.correct_answer);
-            answerContainer.append(essayAnswerNode);
+            const node = document.importNode(templates.answerEssay, true);
+            if (data) $(node).find('.correct-answer-textarea').val(data.correct_answer);
+            answerContainer.append(node);
         } else if (selectedType === 'multiple_choice') {
-            const mcAnswerNode = document.importNode(templates.answerMc, true);
-            const mcAnswer = $(mcAnswerNode);
-            answerContainer.append(mcAnswer);
-            const addBtn = mcAnswer.find('.add-option-btn')[0];
+            const node = document.importNode(templates.answerMc, true);
+            const mcAnswerWrapper = $(node.firstElementChild);
+
+            const allowMultipleCb = mcAnswerWrapper.find('.allow-multiple-answers-cb');
+            const addBtn = mcAnswerWrapper.find('.add-option-btn')[0];
+            const optionsList = mcAnswerWrapper.find('.mc-options-list');
+
+            // Set initial state of "allow multiple" checkbox
+            const allowMultiple = data ? data.allow_multiple_answers == 1 : false;
+            allowMultipleCb.prop('checked', allowMultiple);
+
+            answerContainer.append(mcAnswerWrapper);
 
             if (data && data.options && data.options.length > 0) {
                 data.options.forEach(opt => addMcOption(addBtn, opt));
             } else {
-                addMcOption(addBtn);
-                addMcOption(addBtn);
+                addMcOption(addBtn); addMcOption(addBtn); // Default 2 options
             }
+            // Update input types (radio/checkbox) after adding options
+            updateMcInputType(optionsList, allowMultiple);
         }
     }
 
-    /**
-     * Menambah opsi jawaban pilihan ganda. Bisa diisi dengan data.
-     * @param {HTMLElement} button - Tombol 'Add Option'.
-     * @param {object|null} data - Data opsi yang sudah ada.
-     */
     function addMcOption(button, data = null) {
         const optionsList = $(button).siblings('.mc-options-list');
         const newOptionNode = document.importNode(templates.mcOption, true);
-        const newOption = $(newOptionNode);
+        const newOption = $(newOptionNode.firstElementChild);
 
         if (data) {
             newOption.find('.option-input').val(data.option_text);
-            newOption.find('.correct-answer-checkbox').prop('checked', data.is_correct == 1);
+            newOption.find('.correct-answer-selector').prop('checked', data.is_correct == 1);
         }
 
         optionsList.append(newOption);
+
+        // Let renderAnswerContainer handle the input type update
+        const allowMultiple = $(button).closest('.answer-container').find('.allow-multiple-answers-cb').is(':checked');
+        updateMcInputType(optionsList, allowMultiple);
         reorderOptions(optionsList);
     }
+
+    /**
+     * Changes MC input types between 'radio' and 'checkbox'
+     */
+    function updateMcInputType(optionsList, allowMultiple) {
+        const questionIndex = optionsList.closest('.question-card').index();
+        const inputs = optionsList.find('.correct-answer-selector');
+
+        if (allowMultiple) {
+            inputs.attr('type', 'checkbox').attr('name', null);
+        } else {
+            // Uncheck all before switching to radio to prevent multiple checked
+            if (inputs.filter(':checked').length > 1) {
+                inputs.prop('checked', false);
+            }
+            inputs.attr('type', 'radio').attr('name', `correct_answer_q${questionIndex}`);
+        }
+    }
+
 
     // ======================================================================
     // FUNGSI BANTUAN (HELPERS) & UI
@@ -225,7 +210,7 @@ $(function () {
     }
 
     // ======================================================================
-    // VALIDASI FORM
+    // VALIDASI FORM (sudah lengkap)
     // ======================================================================
     function validateForm() {
         let isValid = true;
@@ -288,7 +273,7 @@ $(function () {
                     errors.push(`Question ${index + 1}: At least 2 options are required.`);
                     isValid = false;
                 }
-                if ($card.find('.correct-answer-checkbox:checked').length === 0) {
+                if ($card.find('.correct-answer-selector:checked').length === 0) {
                     errors.push(`Question ${index + 1}: At least one correct answer must be selected.`);
                     isValid = false;
                 }
@@ -307,6 +292,7 @@ $(function () {
         }
         return isValid;
     }
+
 
     // ======================================================================
     // MEMBUAT PAYLOAD DATA UNTUK DIKIRIM KE SERVER
@@ -330,18 +316,20 @@ $(function () {
                 question_text: $card.find('.question-text').val().trim(),
                 type: $card.find('.question-type-select').val(),
                 score: parseInt($card.find('.question-score').val(), 10) || 0,
+                allow_multiple_answers: false, // Default value
                 options: [],
                 correct_answer: null
             };
 
             if (questionData.type === 'multiple_choice') {
+                questionData.allow_multiple_answers = $card.find('.allow-multiple-answers-cb').is(':checked');
                 $card.find('.mc-option').each(function (optIndex) {
                     const optionText = $(this).find('.option-input').val().trim();
                     if (optionText) {
                         questionData.options.push({
                             option_letter: getOptionLetter(optIndex),
                             option_text: optionText,
-                            is_correct: $(this).find('.correct-answer-checkbox').is(':checked')
+                            is_correct: $(this).find('.correct-answer-selector').is(':checked')
                         });
                     }
                 });
@@ -357,10 +345,9 @@ $(function () {
 
 
     // ======================================================================
-    // EVENT LISTENERS UNTUK TOMBOL DAN INTERAKSI
+    // EVENT LISTENERS
     // ======================================================================
 
-    // Listener untuk tombol simpan/update
     $('#saveBtn').on('click', function () {
         if (!validateForm()) return;
 
@@ -370,24 +357,24 @@ $(function () {
 
         const payload = buildPayload();
         let url = '/api/assignments';
-        let method = 'POST'; // AJAX method is always POST
+        let method = 'POST';
 
         if (isEdit) {
             url = `/api/assignments/${assignmentId}`;
-            payload._method = 'PUT'; // Use method spoofing for Laravel update
+            payload._method = 'PUT'; // Laravel method spoofing
         }
 
         $.ajax({
             url: url,
-            method: method,
+            method: 'POST', // Always POST for AJAX, use _method for PUT/PATCH
             contentType: 'application/json',
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             data: JSON.stringify(payload),
-            success: function(response) {
+            success: function (response) {
                 alert(response.message);
                 window.location.href = '/assignment';
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 saveBtn.prop('disabled', false).html(originalText);
                 if (xhr.status === 422) {
                     const errors = xhr.responseJSON.errors;
@@ -404,30 +391,34 @@ $(function () {
         });
     });
 
-    // Listeners untuk interaksi question builder
     $('#add-question-btn').on('click', () => {
         addQuestion();
         updateUI();
     });
-    questionBuilder.on('change', '.question-type-select', function() {
+    questionBuilder.on('change', '.question-type-select', function () {
         renderAnswerContainer(this);
     });
-    questionBuilder.on('click', '.btn-remove-question', function() {
+    questionBuilder.on('click', '.btn-remove-question', function () {
         if (confirm('Are you sure you want to delete this question?')) {
             $(this).closest('.question-card').remove();
             updateUI();
         }
     });
-    questionBuilder.on('click', '.add-option-btn', function() {
+    questionBuilder.on('click', '.add-option-btn', function () {
         addMcOption(this);
     });
-    questionBuilder.on('click', '.btn-remove-option', function() {
+    questionBuilder.on('click', '.btn-remove-option', function () {
         const option = $(this).closest('.mc-option');
         const optionsList = option.closest('.mc-options-list');
         option.remove();
         reorderOptions(optionsList);
     });
-    questionBuilder.on('change', '.correct-answer-checkbox', function () {
-        // (Fungsi validasi checkbox bisa ditambahkan di sini jika perlu)
+
+    // Listener untuk switch 'Allow multiple answers'
+    questionBuilder.on('change', '.allow-multiple-answers-cb', function () {
+        const isChecked = $(this).is(':checked');
+        const optionsList = $(this).closest('.answer-container').find('.mc-options-list');
+        updateMcInputType(optionsList, isChecked);
     });
+
 });

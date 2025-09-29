@@ -98,8 +98,7 @@
 
             {{-- Action Buttons --}}
             <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-                <a href="/assignment" class="btn btn-secondary"><i
-                        class="fas fa-arrow-left me-2"></i>Cancel</a>
+                <a href="/assignment" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i>Cancel</a>
                 <button type="button" class="btn btn-success" id="saveBtn">
                     <i class="fas fa-save me-2"></i>
                     {{ isset($assignment) ? 'Update Assignment' : 'Save Assignment' }}
@@ -165,11 +164,18 @@
     </template>
 
     <template id="answer-mc-template">
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Answer Options <small class="text-muted">(Check the correct
-                    answer/s)</small></label>
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label fw-semibold mb-0">Answer Options <small class="text-muted">(Check the correct
+                        answer/s)</small></label>
+
+                <div class="form-check form-switch">
+                    <input class="form-check-input allow-multiple-answers-cb" type="checkbox" role="switch">
+                    <label class="form-check-label small">Allow multiple answers</label>
+                </div>
+            </div>
+
             <div class="mc-options-list">
-                {{-- Options will be added here --}}
             </div>
             <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option-btn">
                 <i class="fas fa-plus me-1"></i>Add Option
@@ -180,7 +186,7 @@
     <template id="mc-option-template">
         <div class="d-flex align-items-center mb-2 p-2 border rounded mc-option">
             <div class="form-check me-3">
-                <input class="form-check-input correct-answer-checkbox" type="checkbox" value=""
+                <input class="form-check-input correct-answer-selector" value=""
                     style="width: 1.5em; height: 1.5em;">
             </div>
             <div class="option-label me-3"></div>

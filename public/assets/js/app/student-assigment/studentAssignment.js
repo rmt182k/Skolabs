@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <p class="card-text mb-0">
                                     <i class="bi bi-calendar-check"></i> Batas Waktu: <strong>${dueDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</strong>
                                 </p>
-                                <a href="/student/assignment/${assignment.id}" class="btn btn-primary btn-sm">
+                                <a href="/student-assignments/${assignment.id}/take" class="btn btn-primary btn-sm">
                                     Lihat Detail <i class="bi bi-arrow-right-short"></i>
                                 </a>
                             </div>
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>${dueDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
                     <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
                     <td class="text-end">
-                        <a href="/student/assignment/${assignment.id}" class="btn btn-primary btn-sm">Lihat Detail</a>
+                        <a href="/student-assignments/${assignment.id}" class="btn btn-primary btn-sm">Lihat Detail</a>
                     </td>
                 </tr>`;
             tableBody.innerHTML += rowHTML;

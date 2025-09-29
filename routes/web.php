@@ -85,6 +85,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('student-assignment.index');
     });
 
+    Route::get('/student-assignments/{id}/take',  function(){
+        return view('student-assignment.partials.form');
+    })->name('student.assignments.show');
+
+    Route::get('/api/student-assignments/{id}/show', [StudentAssigmentController::class, 'showForTaking'])->name('student-assignments.show');
+    Route::post('/api/student-assignments/{id}/submit', [StudentAssigmentController::class, 'submitAnswers'])->name('student-assignments.submit');
+
+
+
     Route::get('/api/student-assignments', [StudentAssigmentController::class,'index'])->name('student-assigments.index');
 
     Route::get('/api/roles', [RoleController::class, 'index'])->name('roles.index');
