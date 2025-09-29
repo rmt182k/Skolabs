@@ -8,12 +8,16 @@ use App\Http\Controllers\ClassStudentController;
 use App\Http\Controllers\EducationalLevelController;
 use App\Http\Controllers\LearningMaterialController;
 use App\Http\Controllers\MajorController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\ModuleManagementController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
-use App\Models\LearningMaterial;
 use Illuminate\Support\Facades\Route;
+use App\Models\LearningMaterial;
 
 Route::get('/', function () {
     return view('welcome');
@@ -71,6 +75,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
      Route::get('/module-management', function () {
         return view('module-management.index');
     });
+
+    Route::get('/api/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/api/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+    Route::get('/api/menus', [MenuController::class, 'index'])->name('menus.index');
+
+    Route::post('api/module-management/menus',[ModuleManagementController::class,'storeMenu'])->name('module-management.store-permissions');
+    Route::put('api/module-management/menus/{id}',[ModuleManagementController::class,'updateMenu'])->name('module-management.update-permissions');
 
     // --- Student API Routes ---
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');

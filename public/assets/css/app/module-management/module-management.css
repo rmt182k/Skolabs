@@ -1,0 +1,50 @@
+/* Style untuk tabel */
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+/* Style untuk checkbox di tengah */
+.table .form-check {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 24px;
+}
+
+.table .form-check-input {
+    margin: 0;
+}
+
+/* Style untuk menu parent (bold) */
+.menu-parent {
+    font-weight: bold;
+}
+
+/* Style untuk menu child (indentasi) */
+.menu-child {
+    padding-left: 2rem !important;
+}
+
+/* Style untuk Select2 icon */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    display: flex;
+    align-items: center;
+}
+
+.select2-container--bootstrap-5 .select2-results__option {
+    display: flex;
+    align-items: center;
+}
+
+.select2-results__option .fa,
+.select2-results__option .fas {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.select2-selection__rendered .fa,
+.select2-selection__rendered .fas {
+    margin-right: 10px;
+}
