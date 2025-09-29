@@ -335,7 +335,7 @@ class ModuleManagementController extends Controller
             Log::error('Error saving permissions: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to save permissions. Please try again later.'
+                'message' => 'Failed to save permissions. Please try again later.' . $e->getMessage()
             ], 500);
         }
     }

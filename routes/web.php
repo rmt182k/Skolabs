@@ -13,6 +13,7 @@ use App\Http\Controllers\ModuleManagementController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StudentAssigmentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
@@ -76,12 +77,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('module-management.index');
     });
 
+    Route::get('/assignment-submission', function () {
+        return view('assignment-submission.index');
+    });
+
+    Route::get('/student-assignment', function () {
+        return view('student-assignment.index');
+    });
+
+    Route::get('/api/student-assignments', [StudentAssigmentController::class,'index'])->name('student-assigments.index');
+
     Route::get('/api/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::get('/api/permissions', [PermissionController::class, 'index'])->name('permissions.index');
     Route::get('/api/menus', [MenuController::class, 'index'])->name('menus.index');
 
-    Route::post('api/module-management/menus',[ModuleManagementController::class,'storeMenu'])->name('module-management.store-permissions');
-    Route::put('api/module-management/menus/{id}',[ModuleManagementController::class,'updateMenu'])->name('module-management.update-permissions');
+    Route::post('api/module-management/menus',[ModuleManagementController::class,'storeMenu'])->name('module-management.store-menu');
+    Route::put('api/module-management/menus/{id}',[ModuleManagementController::class,'updateMenu'])->name('module-management.update-menu');
+    Route::get('/api/module-management/role-permissions', [ModuleManagementController::class, 'getPermissions'])->name('role-permissions.index');
+    Route::post('api/module-management/role-permissions',[ModuleManagementController::class,'savePermissions'])->name('module-management.store-permission');
 
     // --- Student API Routes ---
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
@@ -155,11 +168,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/api/assignments/{id}', [AssignmentController::class, 'destroy'])->name('assignments.destroy');
 
     // --- Assignment Submission API Routes ---
-    Route::get('/assignment-submission', [AssignmentSubmissionController::class, 'viewAllSubmissionsPage'])->name('all-submissions.page');
+    Route::get('/assignment-submissions', [AssignmentSubmissionController::class, 'index'])->name('all-submissions.page');
     Route::get('/assignment/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'viewSubmissionsPage'])->name('assignment.submissions.page');
     Route::get('/api/assignment-submissions', [AssignmentSubmissionController::class, 'getAllSubmissions'])->name('all-submissions.api.index');
     Route::get('/api/assignments/{assignmentId}/submissions', [AssignmentSubmissionController::class, 'index'])->name('assignment.submissions.index');
     Route::get('/api/submissions/{submissionId}', [AssignmentSubmissionController::class, 'show'])->name('submission.show');
     Route::post('/api/submissions/{submissionId}/grade', [AssignmentSubmissionController::class, 'grade'])->name('submission.grade');
+
+    Route::get('student-assigments', [StudentAssigmentController::class,'index'])->name('student-assigments.index');
 
 });

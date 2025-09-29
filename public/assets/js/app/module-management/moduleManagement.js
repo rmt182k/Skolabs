@@ -177,7 +177,7 @@ $(document).ready(function () {
 
     function loadPermissionsData() {
         $.ajax({
-            url: '/api/permissions',
+            url: apiBaseUrl + '/role-permissions',
             type: 'GET',
             dataType: 'json',
             success: function (response) {
@@ -573,7 +573,7 @@ $(document).ready(function () {
 
         // Kirim ke server via AJAX
         $.ajax({
-            url: apiBaseUrl + '/permissions',
+            url: apiBaseUrl + '/role-permissions',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',

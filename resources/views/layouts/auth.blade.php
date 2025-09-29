@@ -31,7 +31,8 @@
     <link href="{{ asset('assets/css/mdi/css/materialdesignicons.min.css') }}" rel="stylesheet" type="text/css" />
 
     <!-- Datatables css -->
-    <link href="{{ asset('assets/vendor/datatables/responsive.bootstrap5.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('assets/vendor/datatables/responsive.bootstrap5.min.css') }}" rel="stylesheet"
+        type="text/css">
     <!-- For checkbox Select-->
     <link href="{{ asset('assets/vendor/datatables/select.bootstrap5.min.css') }}" rel="stylesheet" type="text/css">
     <!-- For Buttons -->
@@ -39,6 +40,9 @@
     <!-- Fixe header-->
     <link href="{{ asset('assets/vendor/datatables/fixedHeader.bootstrap5.min.css') }}" rel="stylesheet"
         type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-K5mQJ6E7E9KcQ1w2Z+Z7tprlZxqNftwbMZQjzW1zBq5uWZbnIBzj1iX3A9JjX9L4gXKwI3+2nDZnZP5h0ZpJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     @stack('styles')
 </head>

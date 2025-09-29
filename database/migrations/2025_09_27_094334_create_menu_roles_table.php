@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('can_create')->default(false);
             $table->boolean('can_update')->default(false);
             $table->boolean('can_delete')->default(false);
+            $table->timestamps();
         });
     }
 

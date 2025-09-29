@@ -159,6 +159,12 @@
                         </div>
                     </li>
 
+                    <li class="side-nav-item">
+                        <a href="/student-assignment" class="side-nav-link">
+                            <i class="uil-clipboard-alt"></i>
+                            <span> Student Assignment </span>
+                        </a>
+                    </li>
 
                     <li class="side-nav-item">
                         <a href="#" class="side-nav-link">
