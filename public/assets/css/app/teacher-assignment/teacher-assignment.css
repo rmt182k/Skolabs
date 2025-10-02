@@ -1,0 +1,51 @@
+.assignment-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e0e0e0;
+    border-left-width: 5px;
+}
+
+.assignment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Warna border sesuai status untuk Guru */
+.assignment-card.status-active {
+    border-left-color: #0d6efd;
+    /* Biru untuk tugas aktif */
+}
+
+.assignment-card.status-grading {
+    border-left-color: #ffc107;
+    /* Kuning untuk perlu dinilai */
+}
+
+.assignment-card.status-completed {
+    border-left-color: #198754;
+    /* Hijau untuk selesai */
+}
+
+.status-badge {
+    font-size: 0.8rem;
+    padding: 0.4em 0.8em;
+    border-radius: 50px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.status-badge.bg-active {
+    background-color: #0d6efd;
+}
+
+.status-badge.bg-grading {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.status-badge.bg-completed {
+    background-color: #198754;
+}
+
+.progress-container {
+    margin-top: 0.5rem;
+}

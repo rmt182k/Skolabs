@@ -23,16 +23,16 @@
         {{-- Bagian Filter dan Search yang lebih lengkap untuk Guru --}}
         <div class="card mb-4">
             <div class="card-body">
+                {{-- UBAH INI: Layout kolom diubah untuk mengakomodasi filter baru --}}
                 <div class="row g-3 align-items-center">
-                    <div class="col-md-5">
+                    <div class="col-md-4"> {{-- Diubah dari col-md-5 --}}
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
                             <input type="search" class="form-control" id="search-input"
                                 placeholder="Cari berdasarkan judul tugas...">
                         </div>
                     </div>
-                    {{-- Filter tambahan untuk Kelas --}}
-                    <div class="col-md-4">
+                    <div class="col-md-3"> {{-- Diubah dari col-md-4 --}}
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-people"></i></span>
                             <select class="form-select" id="class-filter">
@@ -41,12 +41,22 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3"> {{-- Tetap col-md-3 --}}
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-book"></i></span>
                             <select class="form-select" id="course-filter">
                                 <option value="">Semua Mata Pelajaran</option>
                                 {{-- Opsi mata pelajaran akan di-generate oleh JavaScript --}}
+                            </select>
+                        </div>
+                    </div>
+                    {{-- TAMBAHKAN INI: Filter baru untuk Tipe Tugas --}}
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                            <select class="form-select" id="type-filter">
+                                <option value="">Semua Tipe</option>
+                                {{-- Opsi tipe akan di-generate oleh JavaScript --}}
                             </select>
                         </div>
                     </div>
@@ -102,6 +112,8 @@
                         <thead>
                             <tr>
                                 <th scope="col">Judul Tugas</th>
+                                {{-- TAMBAHKAN INI: Kolom header baru untuk Tipe --}}
+                                <th scope="col">Tipe</th>
                                 <th scope="col">Kelas & Mapel</th>
                                 <th scope="col">Batas Waktu</th>
                                 <th scope="col">Progres Pengumpulan</th>

@@ -16,7 +16,9 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentAssigmentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherAssignmentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TeacherSubmissionController;
 use Illuminate\Support\Facades\Route;
 use App\Models\LearningMaterial;
 
@@ -73,7 +75,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assignment/create', function () {
         return view('assignment.components.form');
     });
-     Route::get('/module-management', function () {
+    Route::get('/module-management', function () {
         return view('module-management.index');
     });
 
@@ -85,25 +87,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('student-assignment.index');
     });
 
-    Route::get('/student-assignments/{id}/take',  function(){
+    Route::get('/student-assignments/{id}/take', function () {
         return view('student-assignment.partials.form');
     })->name('student.assignments.show');
+
+    Route::get('/teacher-assignment', function () {
+        return view('teacher-assignment.index');
+    });
+
+    Route::get('/teacher-assignment/{id}/submissions', function () {
+        return view('teacher-assignment.partials.show');
+    })->name('teacher-assignment-submission.show');
+
+    Route::get('/api/teacher-assignment/{assignment}/submissions', [TeacherSubmissionController::class, 'getSubmissions'])->name('api.teacher.submissions');
 
     Route::get('/api/student-assignments/{id}/show', [StudentAssigmentController::class, 'showForTaking'])->name('student-assignments.show');
     Route::post('/api/student-assignments/{id}/submit', [StudentAssigmentController::class, 'submitAnswers'])->name('student-assignments.submit');
 
 
 
-    Route::get('/api/student-assignments', [StudentAssigmentController::class,'index'])->name('student-assigments.index');
+    Route::get('/api/student-assignments', [StudentAssigmentController::class, 'index'])->name('student-assigments.index');
 
     Route::get('/api/roles', [RoleController::class, 'index'])->name('roles.index');
     Route::get('/api/permissions', [PermissionController::class, 'index'])->name('permissions.index');
     Route::get('/api/menus', [MenuController::class, 'index'])->name('menus.index');
 
-    Route::post('api/module-management/menus',[ModuleManagementController::class,'storeMenu'])->name('module-management.store-menu');
-    Route::put('api/module-management/menus/{id}',[ModuleManagementController::class,'updateMenu'])->name('module-management.update-menu');
+    Route::post('api/module-management/menus', [ModuleManagementController::class, 'storeMenu'])->name('module-management.store-menu');
+    Route::put('api/module-management/menus/{id}', [ModuleManagementController::class, 'updateMenu'])->name('module-management.update-menu');
     Route::get('/api/module-management/role-permissions', [ModuleManagementController::class, 'getPermissions'])->name('role-permissions.index');
-    Route::post('api/module-management/role-permissions',[ModuleManagementController::class,'savePermissions'])->name('module-management.store-permission');
+    Route::post('api/module-management/role-permissions', [ModuleManagementController::class, 'savePermissions'])->name('module-management.store-permission');
 
     // --- Student API Routes ---
     Route::get('/api/students', [StudentController::class, 'index'])->name('students.index');
@@ -184,6 +196,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/submissions/{submissionId}', [AssignmentSubmissionController::class, 'show'])->name('submission.show');
     Route::post('/api/submissions/{submissionId}/grade', [AssignmentSubmissionController::class, 'grade'])->name('submission.grade');
 
-    Route::get('student-assigments', [StudentAssigmentController::class,'index'])->name('student-assigments.index');
+    Route::get('student-assigments', [StudentAssigmentController::class, 'index'])->name('student-assigments.index');
+
+    Route::get('/api/teacher/assignments', [TeacherAssignmentController::class, 'getAssignments']);
+    Route::get('/api/teacher/assignments/filters', [TeacherAssignmentController::class, 'getFilterData']);
+    Route::get('/teacher/assignment/{assignment}/submissions', [TeacherSubmissionController::class, 'getSubmissions']);
 
 });
