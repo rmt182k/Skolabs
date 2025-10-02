@@ -15,7 +15,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold mb-0">📋 Manajemen Tugas & Penilaian</h2>
             {{-- Tombol Aksi Utama untuk Guru: Membuat Tugas Baru --}}
-            <a href="/teacher/assignment/create" class="btn btn-primary">
+            <a href="/teacher-assignment/create" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i> Buat Tugas Baru
             </a>
         </div>
@@ -90,10 +90,10 @@
             {{-- Tombol untuk beralih tampilan --}}
             <div class="btn-group" role="group" aria-label="View toggle">
                 <button type="button" class="btn btn-outline-primary active" id="view-card-btn" title="Tampilan Kartu">
-                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                    Card<i class="bi bi-grid-3x3-gap-fill"></i>
                 </button>
                 <button type="button" class="btn btn-outline-primary" id="view-table-btn" title="Tampilan Tabel">
-                    <i class="bi bi-table"></i>
+                    Table<i class="bi bi-table"></i>
                 </button>
             </div>
         </div>

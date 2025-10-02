@@ -95,11 +95,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('teacher-assignment.index');
     });
 
+    Route::get('/teacher-assignment/create', function () {
+        return view('teacher-assignment.partials.create');
+    });
+
     Route::get('/teacher-assignment/{id}/submissions', function () {
         return view('teacher-assignment.partials.show');
     })->name('teacher-assignment-submission.show');
 
+    Route::get('/teacher-submission/{id}/grade', function () {
+        return view('teacher-assignment.partials.grade');
+    })->name('teacher-assignment.grade');
+
     Route::get('/api/teacher-assignment/{assignment}/submissions', [TeacherSubmissionController::class, 'getSubmissions'])->name('api.teacher.submissions');
+    Route::get('/api/teacher-submissions/{submission}/grade', [TeacherSubmissionController::class, 'showGradeForm']);
+    Route::post('/api/teacher-submissions/{submission}/grade', [TeacherSubmissionController::class, 'storeGrade']);
 
     Route::get('/api/student-assignments/{id}/show', [StudentAssigmentController::class, 'showForTaking'])->name('student-assignments.show');
     Route::post('/api/student-assignments/{id}/submit', [StudentAssigmentController::class, 'submitAnswers'])->name('student-assignments.submit');

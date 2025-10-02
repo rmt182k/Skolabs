@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('question_id');
             $table->text('answer')->nullable();
             $table->decimal('grade', 5, 2)->nullable();
+            $table->text('feedback')->nullable();
             $table->timestamps();
         });
     }

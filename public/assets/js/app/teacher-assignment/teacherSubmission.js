@@ -86,8 +86,8 @@ $(function () {
                 render: function (data, type, row) {
                     if (row.submission_id) {
                         return (row.total_grade !== null)
-                            ? `<a href="/teacher/submission/${row.submission_id}/review" class="btn btn-sm btn-outline-success">Lihat</a>`
-                            : `<a href="/teacher/submission/${row.submission_id}/grade" class="btn btn-sm btn-primary">Beri Nilai</a>`;
+                            ? `<a href="/teacher-submission/${row.submission_id}/grade" class="btn btn-sm btn-outline-success">Lihat</a>`
+                            : `<a href="/teacher-submission/${row.submission_id}/grade" class="btn btn-sm btn-primary">Beri Nilai</a>`;
                     }
                     return `<button class="btn btn-sm btn-secondary" disabled>Tidak Ada Aksi</button>`;
                 }
