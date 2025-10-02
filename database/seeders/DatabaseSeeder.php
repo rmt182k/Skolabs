@@ -18,6 +18,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'roymartogit@gmail.com',
             'email_verified_at' => now(),
         ]);
+        User::factory()->create([
+            'name' => 'Muhammad Fakhran Hadyan',
+            'email' => 'fakhran@gmail.com',
+            'email_verified_at' => now(),
+        ]);
         $this->call([
             RoleSeeder::class,
             EducationalDataSeeder::class,
