@@ -107,6 +107,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('teacher-assignment.partials.grade');
     })->name('teacher-assignment.grade');
 
+    Route::get('/class-management', function () {
+        return view('class-management.index');
+    });
+
     Route::get('/api/teacher-assignment/{assignment}/submissions', [TeacherSubmissionController::class, 'getSubmissions'])->name('api.teacher.submissions');
     Route::get('/api/teacher-submissions/{submission}/grade', [TeacherSubmissionController::class, 'showGradeForm']);
     Route::post('/api/teacher-submissions/{submission}/grade', [TeacherSubmissionController::class, 'storeGrade']);

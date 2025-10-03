@@ -116,6 +116,13 @@
                     </li>
 
                     <li class="side-nav-item">
+                        <a href="/class-management" class="side-nav-link">
+                            <i class="uil-books"></i>
+                            <span> Class Management </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-item">
                         <a href="/subject" class="side-nav-link">
                             <i class="uil-books"></i>
                             <span> Subjects </span>
