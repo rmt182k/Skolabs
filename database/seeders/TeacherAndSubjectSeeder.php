@@ -40,6 +40,7 @@ class TeacherAndSubjectSeeder extends Seeder
                     'name' => fake()->name(),
                     'email' => fake()->unique()->safeEmail(),
                     'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
                 ]);
 
                 // *** PERBAIKAN DI SINI ***
