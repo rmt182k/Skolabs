@@ -5,6 +5,7 @@ use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassStudentController;
+use App\Http\Controllers\TeacherSubjectAssignmentController;
 use App\Http\Controllers\EducationalLevelController;
 use App\Http\Controllers\LearningMaterialController;
 use App\Http\Controllers\MajorController;
@@ -27,6 +28,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/api/user-menu', [ModuleManagementController::class, 'getUserMenu']);
 
     // --- Page View Routes ---
     Route::get('/dashboard', function () {
@@ -111,15 +114,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('class-management.index');
     });
 
+    Route::get('/class-subject-assignment', function () {
+        return view('class-subject-assignment.index');
+    });
+
+    Route::get('/api/class-subjects/data', [TeacherSubjectAssignmentController::class, 'data']);
+    Route::get('/api/class-subjects/create-data', [TeacherSubjectAssignmentController::class, 'createData']);
+    Route::post('/api/class-subjects', [TeacherSubjectAssignmentController::class, 'store']);
+    Route::put('/api/class-subjects/{schedule}', [TeacherSubjectAssignmentController::class, 'update']);
+    Route::delete('/api/class-subjects/{schedule}', [TeacherSubjectAssignmentController::class, 'destroy']);
+    Route::get('/api/class-subjects/data-grouped', [TeacherSubjectAssignmentController::class, 'dataGroupedByClass']);
+    Route::get('/api/class-subjects/filters', [TeacherSubjectAssignmentController::class, 'getFilterData']);
+    Route::get('/api/class-subjects/{classSubject}', [TeacherSubjectAssignmentController::class, 'show'])->name('class-subjects.show');
+
     Route::get('/api/teacher-assignment/{assignment}/submissions', [TeacherSubmissionController::class, 'getSubmissions'])->name('api.teacher.submissions');
     Route::get('/api/teacher-submissions/{submission}/grade', [TeacherSubmissionController::class, 'showGradeForm']);
     Route::post('/api/teacher-submissions/{submission}/grade', [TeacherSubmissionController::class, 'storeGrade']);
 
     Route::get('/api/student-assignments/{id}/show', [StudentAssigmentController::class, 'showForTaking'])->name('student-assignments.show');
     Route::post('/api/student-assignments/{id}/submit', [StudentAssigmentController::class, 'submitAnswers'])->name('student-assignments.submit');
-
-
-
     Route::get('/api/student-assignments', [StudentAssigmentController::class, 'index'])->name('student-assigments.index');
 
     Route::get('/api/roles', [RoleController::class, 'index'])->name('roles.index');
@@ -183,6 +196,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/subjects/create-data', [SubjectController::class, 'getCreateData'])->name('subjects.create-data');
     Route::get('/api/subjects/{id}', [SubjectController::class, 'show'])->name('subjects.show');
     Route::put('/api/subjects/{id}', [SubjectController::class, 'update'])->name('subjects.update');
+    Route::get('/api/subjects/{id}/teachers', [TeacherController::class, 'getTeachersBySubject'])->name('getTeachersBySubject.show');
     Route::delete('/api/subjects/{id}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
     // --- Learning Material API Routes ---

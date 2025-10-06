@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subject;
 use Exception;
 use App\Models\Role;
 use App\Models\UserRole;
@@ -267,6 +268,37 @@ class TeacherController extends Controller
             DB::rollBack();
             Log::error('Error deleting teacher: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to delete teacher.'], 500);
+        }
+    }
+
+    public function getTeachersBySubject($id)
+    {
+        try {
+            // 1. Build the query without executing it yet
+            $query = DB::table('subject_teachers')
+                ->join('teachers', 'subject_teachers.teacher_id', '=', 'teachers.id')
+                ->join('users', 'teachers.user_id', '=', 'users.id')
+                ->where('subject_teachers.subject_id', $id)
+                ->select('teachers.id', 'users.name')
+                ->orderBy('users.name');
+
+            $teachers = $query->get();
+
+            // Menambahkan informasi debug ke response JSON
+            return response()->json([
+                'success' => true,
+                'data' => $teachers,
+                'debug' => [
+                    'sql' => $query->toSql(),
+                    'bindings' => $query->getBindings(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            Log::error('Error fetching teachers for subject ' . $id . ': ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve teachers for the subject.'
+            ], 500);
         }
     }
 }

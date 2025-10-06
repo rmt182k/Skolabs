@@ -123,6 +123,13 @@
                     </li>
 
                     <li class="side-nav-item">
+                        <a href="/class-subject-assignment" class="side-nav-link">
+                            <i class="uil-books"></i>
+                            <span> Class Subject Management </span>
+                        </a>
+                    </li>
+
+                    <li class="side-nav-item">
                         <a href="/subject" class="side-nav-link">
                             <i class="uil-books"></i>
                             <span> Subjects </span>
@@ -210,7 +217,6 @@
                             </ul>
                         </div>
                     </li>
-
                 </ul>
                 <!--- End Sidemenu -->
 

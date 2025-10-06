@@ -6,6 +6,7 @@ use App\Models\Menu;
 use App\Models\MenuRole;
 use App\Models\Role;
 use Exception;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -338,5 +339,70 @@ class ModuleManagementController extends Controller
                 'message' => 'Failed to save permissions. Please try again later.' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getUserMenu()
+    {
+        try {
+            // 1. Dapatkan ID pengguna yang sedang login
+            $userId = Auth::id();
+
+            // Validasi jika tidak ada user yang login
+            if (!$userId) {
+                return response()->json(['success' => false, 'message' => 'User not authenticated.'], 401);
+            }
+
+            // 2. Dapatkan role_id dari tabel pivot 'user_roles'
+            $roleId = DB::table('user_roles')->where('user_id', $userId)->value('role_id');
+
+            // Validasi jika user tidak memiliki role
+            if (!$roleId) {
+                return response()->json(['success' => false, 'message' => 'User has no assigned role.'], 401);
+            }
+
+            // 3. Ambil semua menu yang boleh diakses oleh role ini menggunakan Query Builder
+            $accessibleMenus = DB::table('menus')
+                ->join('menu_roles', 'menus.id', '=', 'menu_roles.menu_id')
+                ->where('menu_roles.role_id', $roleId)
+                ->where('menu_roles.can_view', true)
+                ->orderBy('menus.order', 'asc')
+                ->select('menus.*')
+                ->get();
+
+            if ($accessibleMenus->isEmpty()) {
+                return response()->json(['success' => true, 'data' => []]);
+            }
+
+            // 4. Ubah data flat menjadi struktur hirarki (parent-child)
+            // Fungsi buildMenuTree Anda tidak perlu diubah karena ia bekerja dengan Collection
+            $structuredMenu = $this->buildMenuTree($accessibleMenus);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User menu retrieved successfully.',
+                'data' => $structuredMenu
+            ], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error fetching user menu: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve user menu.'], 500);
+        }
+    }
+
+    private function buildMenuTree($elements, $parentId = 0)
+    {
+        $branch = [];
+
+        foreach ($elements as $element) {
+            if ($element->parent_id == $parentId) {
+                $children = $this->buildMenuTree($elements, $element->id);
+                if ($children) {
+                    $element->children = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
     }
 }
