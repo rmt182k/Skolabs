@@ -121,7 +121,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/class-subjects/data', [TeacherSubjectAssignmentController::class, 'data']);
     Route::get('/api/class-subjects/create-data', [TeacherSubjectAssignmentController::class, 'createData']);
     Route::post('/api/class-subjects', [TeacherSubjectAssignmentController::class, 'store']);
-    Route::put('/api/class-subjects/{schedule}', [TeacherSubjectAssignmentController::class, 'update']);
+    Route::put('/api/class-subjects/{classSubject}', [TeacherSubjectAssignmentController::class, 'update']);
     Route::delete('/api/class-subjects/{schedule}', [TeacherSubjectAssignmentController::class, 'destroy']);
     Route::get('/api/class-subjects/data-grouped', [TeacherSubjectAssignmentController::class, 'dataGroupedByClass']);
     Route::get('/api/class-subjects/filters', [TeacherSubjectAssignmentController::class, 'getFilterData']);

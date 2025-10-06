@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- KONFIGURASI & VARIABEL GLOBAL ---
-    // URL API diubah ke '/api/class-subjects' agar sesuai dengan route baru
     const API_URL = '/api/class-subjects';
     const CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
     const assignmentModal = new bootstrap.Modal(document.getElementById('assignmentModal'));
@@ -31,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- FUNGSI BARU: Mengisi Dropdown Filter ---
     function populateFilters() {
-        // URL disesuaikan dengan route baru: /api/class-subjects/filters
         $.getJSON(`${API_URL}/filters`)
             .done(response => {
                 if (response.success) {
@@ -58,7 +56,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 processing: true,
                 ajax: {
                     url: `${API_URL}/data?${queryString}`,
-                    dataSrc: 'data'
+                    // GAYA PENULISAN: Ubah dataSrc jadi fungsi untuk proses response
+                    dataSrc: function(json) {
+                        // Tampilkan academic year dari response
+                        if (json.academic_year) {
+                            $('#academic-year-display').text(`(A.Y. ${json.academic_year})`);
+                        } else {
+                            $('#academic-year-display').text('');
+                        }
+                        // Kembalikan data utama untuk tabel
+                        return json.data;
+                    }
                 },
                 columns: [{
                     data: 'class.name',
@@ -141,6 +149,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             $.getJSON(`${API_URL}/data-grouped?${queryString}`)
                 .done(response => {
+                    // GAYA PENULISAN: Tambahkan logika untuk menampilkan academic year
+                    if (response.academic_year) {
+                        $('#academic-year-display').text(`(A.Y. ${response.academic_year})`);
+                    } else {
+                        $('#academic-year-display').text('');
+                    }
+
                     if (response.success) {
                         renderAssignmentsAsCards(response.data);
                     } else {
@@ -151,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // --- FUNGSI-FUNGSI BANTUAN ---
     const showNotification = (icon, title, text = '') => Swal.fire({ icon, title, text, timer: 2000, showConfirmButton: false });
     const handleAjaxError = (defaultMessage, xhr = null) => {
         const message = xhr?.responseJSON?.message || defaultMessage;
@@ -193,8 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         teacherSelect.prop('disabled', true).html('<option value="">Loading teachers...</option>');
 
-        // Catatan: Pastikan route ini '/api/subjects/{subjectId}/teachers' juga sudah benar
-        // dan tidak perlu diubah. Berdasarkan info yang diberikan, route ini tidak termasuk.
         $.getJSON(`/api/subjects/${subjectId}/teachers`)
             .done(response => {
                 if (response.success) {

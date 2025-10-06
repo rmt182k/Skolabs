@@ -5,25 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Classes;
 use App\Models\ClassSubject;
 use App\Models\Subject;
-use App\Models\Teacher; // Import Teacher model
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
-// Ganti nama class agar lebih sesuai
 class TeacherSubjectAssignmentController extends Controller
 {
     /**
-     * Helper to get the active academic year ID.
+     * Helper to get the active academic year object.
+     * GAYA PENULISAN: Diubah untuk mengembalikan seluruh object.
      */
-    private function getActiveAcademicYearId()
+    private function getActiveAcademicYear()
     {
+        // Ganti 'academic_years' dengan nama tabel yang sesuai jika berbeda
         $activeYear = DB::table('academic_years')->where('status', 'active')->first();
         if (!$activeYear) {
-            // Lemparkan exception yang lebih spesifik jika diperlukan
             throw new Exception("No active academic year found. Please set one up.");
         }
-        return $activeYear->id;
+        return $activeYear;
     }
 
     /**
@@ -32,14 +32,14 @@ class TeacherSubjectAssignmentController extends Controller
     public function data(Request $request)
     {
         try {
-            $activeYearId = $this->getActiveAcademicYearId();
+            $activeYear = $this->getActiveAcademicYear();
 
             $query = ClassSubject::query()
                 ->join('classes', 'class_subjects.class_id', '=', 'classes.id')
                 ->join('subjects', 'class_subjects.subject_id', '=', 'subjects.id')
                 ->join('teachers', 'class_subjects.teacher_id', '=', 'teachers.id')
                 ->join('users', 'teachers.user_id', '=', 'users.id')
-                ->where('class_subjects.academic_year_id', $activeYearId);
+                ->where('class_subjects.academic_year_id', $activeYear->id);
 
             // Terapkan filter
             if ($request->filled('class_id')) {
@@ -52,7 +52,6 @@ class TeacherSubjectAssignmentController extends Controller
                 $query->where('class_subjects.teacher_id', $request->teacher_id);
             }
 
-            // Ganti nama variabel
             $assignmentsData = $query->select(
                 'class_subjects.id',
                 'classes.name as class_name',
@@ -63,7 +62,6 @@ class TeacherSubjectAssignmentController extends Controller
                 ->orderBy('subjects.name')
                 ->get();
 
-            // Ganti nama variabel
             $formattedAssignments = $assignmentsData->map(function ($item) {
                 return [
                     'id' => $item->id,
@@ -73,7 +71,14 @@ class TeacherSubjectAssignmentController extends Controller
                 ];
             });
 
-            return response()->json(['success' => true, 'data' => $formattedAssignments]);
+            // GAYA PENULISAN: Tambahkan academic_year ke response.
+            // Ganti 'year' dengan nama kolom yang sesuai (misal: 'name', 'academic_year').
+            return response()->json([
+                'success' => true,
+                'data' => $formattedAssignments,
+                'academic_year' => $activeYear->year
+            ]);
+
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
@@ -85,15 +90,15 @@ class TeacherSubjectAssignmentController extends Controller
     public function dataGroupedByClass(Request $request)
     {
         try {
-            $activeYearId = $this->getActiveAcademicYearId();
+            $activeYear = $this->getActiveAcademicYear();
 
-            // Query sama dengan method data(), bisa di-refactor jika perlu
+            // Query sama dengan method data()
             $query = ClassSubject::query()
                 ->join('classes', 'class_subjects.class_id', '=', 'classes.id')
                 ->join('subjects', 'class_subjects.subject_id', '=', 'subjects.id')
                 ->join('teachers', 'class_subjects.teacher_id', '=', 'teachers.id')
                 ->join('users', 'teachers.user_id', '=', 'users.id')
-                ->where('class_subjects.academic_year_id', $activeYearId);
+                ->where('class_subjects.academic_year_id', $activeYear->id);
 
             if ($request->filled('class_id')) {
                 $query->where('class_subjects.class_id', $request->class_id);
@@ -105,7 +110,6 @@ class TeacherSubjectAssignmentController extends Controller
                 $query->where('class_subjects.teacher_id', $request->teacher_id);
             }
 
-            // Ganti nama variabel
             $assignmentsData = $query->select(
                 'class_subjects.id',
                 'classes.name as class_name',
@@ -116,14 +120,22 @@ class TeacherSubjectAssignmentController extends Controller
                 ->orderBy('subjects.name')
                 ->get();
 
-            // Ganti nama variabel
             $groupedAssignments = $assignmentsData->groupBy('class_name');
 
-            return response()->json(['success' => true, 'data' => $groupedAssignments]);
+            // GAYA PENULISAN: Tambahkan academic_year ke response.
+            return response()->json([
+                'success' => true,
+                'data' => $groupedAssignments,
+                'academic_year' => $activeYear->year
+            ]);
+
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    // ... sisa method (getFilterData, createData, store, show, update, destroy) tetap sama ...
+    // ... (kode dari user sudah baik dan tidak perlu diubah untuk fungsionalitas ini) ...
 
     /**
      * Get distinct data for populating filter dropdowns.
@@ -131,9 +143,9 @@ class TeacherSubjectAssignmentController extends Controller
     public function getFilterData()
     {
         try {
-            $activeYearId = $this->getActiveAcademicYearId();
+            $activeYear = $this->getActiveAcademicYear();
 
-            $query = ClassSubject::where('academic_year_id', $activeYearId);
+            $query = ClassSubject::where('academic_year_id', $activeYear->id);
 
             $classIds = $query->distinct()->pluck('class_id');
             $subjectIds = $query->distinct()->pluck('subject_id');
@@ -177,11 +189,11 @@ class TeacherSubjectAssignmentController extends Controller
         ]);
 
         try {
-            $activeYearId = $this->getActiveAcademicYearId();
+            $activeYear = $this->getActiveAcademicYear();
 
             $exists = ClassSubject::where('class_id', $request->class_id)
                 ->where('subject_id', $request->subject_id)
-                ->where('academic_year_id', $activeYearId)
+                ->where('academic_year_id', $activeYear->id)
                 ->exists();
 
             if ($exists) {
@@ -189,10 +201,9 @@ class TeacherSubjectAssignmentController extends Controller
             }
 
             ClassSubject::create(array_merge($request->all(), [
-                'academic_year_id' => $activeYearId
+                'academic_year_id' => $activeYear->id
             ]));
 
-            // Ganti pesan
             return response()->json(['success' => true, 'message' => 'Teaching assignment created successfully.']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -202,7 +213,6 @@ class TeacherSubjectAssignmentController extends Controller
     /**
      * Display the specified assignment.
      */
-    // Ganti nama variabel parameter
     public function show($id)
     {
         $classSubject = ClassSubject::findOrFail($id);
@@ -215,8 +225,7 @@ class TeacherSubjectAssignmentController extends Controller
     /**
      * Update the specified assignment.
      */
-    // Ganti nama variabel parameter
-    public function update(Request $request, ClassSubject $teachingAssignment)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'class_id' => 'required|exists:classes,id',
@@ -225,21 +234,21 @@ class TeacherSubjectAssignmentController extends Controller
         ]);
 
         try {
-            $academicYearId = $teachingAssignment->academic_year_id;
+            $classSubject = ClassSubject::findOrFail($id);
+            $academicYearId = $classSubject->academic_year_id;
 
             $exists = ClassSubject::where('class_id', $request->class_id)
                 ->where('subject_id', $request->subject_id)
                 ->where('academic_year_id', $academicYearId)
-                ->where('id', '!=', $teachingAssignment->id) // Cek duplikasi di luar data yang sedang diedit
+                ->where('id', '!=', $classSubject->id)
                 ->exists();
 
             if ($exists) {
                 return response()->json(['message' => 'This subject is already assigned to another teacher in this class for this academic year.'], 422);
             }
 
-            $teachingAssignment->update($request->all());
+            $classSubject->update($request->all());
 
-            // Ganti pesan
             return response()->json(['success' => true, 'message' => 'Teaching assignment updated successfully.']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -249,12 +258,10 @@ class TeacherSubjectAssignmentController extends Controller
     /**
      * Remove the specified assignment.
      */
-    // Ganti nama variabel parameter
     public function destroy(ClassSubject $teachingAssignment)
     {
         try {
             $teachingAssignment->delete();
-            // Ganti pesan
             return response()->json(['success' => true, 'message' => 'Teaching assignment deleted successfully.']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
